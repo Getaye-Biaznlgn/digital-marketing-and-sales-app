@@ -10,19 +10,22 @@
   </div>
 
 
-  <!-- <div
-    v-if="isLoading"
+  <div
+    v-if="store.getters.isLoading"
     class="route-loading p-0 position-fixed top-0 start-0 bottom-0 end-0 w-100 h-100"
   >
     <div class="loading-spinner">
-      <img src="../../assets/preloader.gif" alt="slow connection" />
+      <img src="./assets/loader.gif" alt="slow connection" />
     </div>
-  </div> -->
+  </div>
 </template>
 
 <script setup>
 import TheSidebar from "./components/TheSidebar.vue";
 import TheHeader from "./components/TheHeader.vue";
+import {useStore} from 'vuex'
+const store = useStore()
+
 </script>
 
 <style>
@@ -66,8 +69,8 @@ td {
 .text-dark-blue {
   color: #2f4587;
 }
-.bg-dark-blue {
-  background-color: #2f4587;
+.btn-bg-primary {
+  background-color: #ff7e00;
 }
 .warining input,
 .warining textarea {

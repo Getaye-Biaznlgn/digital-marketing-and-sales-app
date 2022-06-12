@@ -21,7 +21,7 @@
       <label for="imageInpute">
         <div class="fs-2 uploadIcon"><i class="fas fa-upload"></i></div>
         <p>Drag and drop images here or</p>
-        <div class="btn btnSelect m-2">Select Images</div>
+        <div class="btn text-white btn-bg-primary m-2">Select Images</div>
         <div v-if="imageFiles?.length" class="m-2 text-black">
           {{ imageFiles?.length + " " }}<span v-if="imageFiles?.length>1">images choosen</span><span v-else>image choosen</span>
         </div>
@@ -110,19 +110,12 @@ label {
   height: 100%;
   cursor: pointer;
 }
-.btnSelect {
-  border: 1px solid gray;
-  background-color: rgb(134, 134, 177);
-  color: #fff;
-}
-.btnSelect:hover {
-  background-color: rgb(95, 95, 160);
-}
+
 .imageContainer mx-auto:hover {
   border-color: blue;
 }
 .uploadIcon:hover {
-  color: blue;
+  color: #ff8000;
 }
 .active {
   background-color: #f3f3f3;

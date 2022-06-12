@@ -5,7 +5,7 @@
     all products with their details. You can view and edit 
     many information such as product name, description, stock, price and more.
   </div>
-   <button @click="showAddModal" class="btn ms-auto d-flex justify-self-end bg-dark-blue text-light">
+   <button @click="showAddModal" class="btn ms-auto d-flex justify-self-end btn-bg-primary text-light">
         Add New Product
    </button>
 <hr/>
@@ -57,36 +57,34 @@
         <th><span class="sr-only">Action</span></th>
       </tr>
       <tr
-        v-for="(n) in 10"
-        :key="n"
+        v-for="(product,index) in products"
+        :key="product.id"
       >
-        <td>{{n}}</td>
-        <td>BS002</td>
+        <td>{{index+1}}</td>
+        <td>{{product.model}}</td>
         <td>
           <img
-            src="../assets/logo.png"
+            :src="product.images?.[index]?.image_path"
             width="100"
             height="100"
-            alt="Institution photo"
+            alt="product image"
           />
         </td>
-        <td>Z solar E</td>
-        <td>Water pump</td>
-        <td>100</td>
-        <td>200 pound</td>
-        <td>Do it more </td>
-        <td>Active</td>
-        
+        <td>{{product.name}}</td>
+        <td>{{product.price}}</td>
+        <td>{{product.qty}}</td>
+        <td>{{product.weight}}</td>
+        <td>{{product.category?.title}}</td>
+        <td>{{product.isActive}}</td>
         <td
         >
-          <span class="me-2" role="button"
+          <span class="me-2" @click="$router.push({name:'ProductDetail'})" role="button"
             ><i class="far fa-edit"></i
           ></span>
           <span  role="button"
             ><i class="fas fa-trash"></i
           ></span>
         </td>
-       
       </tr>
     </table>
     <add-product-modal :isAddModalVisible="isAddModalVisible" @closeAddModal="closeAddModal"/>
@@ -94,23 +92,45 @@
 
 <script>
 import AddProductModal from '../components/AddProductModal.vue'
+import apiClient from '../resources/baseUrl'
+import {useStore} from 'vuex'
 import { ref} from 'vue';
 export default {
  components:{
     AddProductModal
  },
   setup(){
-       var isAddModalVisible= ref(false);
+    const store= useStore();
+   var isAddModalVisible= ref(false);
+   var products = ref({});
    var closeAddModal= function(){
         isAddModalVisible.value= false
    }
    var showAddModal= function(){
       isAddModalVisible.value = true;
    }
+   const fetchProducts= async function(){
+       try {
+        store.commit("setIsLoading", true);
+        const response = await apiClient.get(
+          `/api/products`
+        );
+        if (response.status === 200) {
+           products.value=response.data
+           console.log('products...', products)
+        }
+      } catch (e) {
+        //
+      } finally {
+        store.commit("setIsLoading", false);
+      }
+   }
+   fetchProducts()
     return {
       isAddModalVisible,
       closeAddModal,
       showAddModal,
+      products
     }
    },
   
@@ -153,8 +173,8 @@ td {
 .text-dark-blue {
   color: #2f4587;
 }
-.bg-dark-blue {
-  background-color: #2f4587;
+.btn-bg-primary {
+  background-color: #ff7e00;
 }
 .warining input,
 .warining textarea {

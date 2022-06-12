@@ -14,7 +14,7 @@
             <i class="fas fa-times"></i>
           </button>
         </div>
-
+       
         <slot></slot>
       </div>
     </div>

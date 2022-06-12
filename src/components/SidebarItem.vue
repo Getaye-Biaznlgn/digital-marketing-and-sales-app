@@ -30,8 +30,8 @@
 
 <style>
 .active {
-  background-color: rgba(0, 0, 0, 0.803);
+  background-color: #062539;
   border-radius: 10px;
-  color:#fff !important;
+  color:#ff7e00 !important;
 }
 </style>

@@ -1,7 +1,7 @@
 <template>
   <div>
     <button
-      class="btn bg-dark-blue d-block ms-auto px-3 text-white"
+      class="btn btn-bg-primary d-block ms-auto px-3 text-white"
       type="submit"
       @click="$emit('submit')"
     >
