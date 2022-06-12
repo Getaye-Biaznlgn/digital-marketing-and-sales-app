@@ -1,30 +1,82 @@
 <template>
-  <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
-  </nav>
-  <router-view/>
+  <the-header></the-header>
+  <div class="d-flex">
+    <div class="sidebar shadow">
+      <the-sidebar></the-sidebar>
+    </div>
+    <div class="container-fluid position-relative ">
+      <router-view></router-view>
+    </div>
+  </div>
+
+
+  <!-- <div
+    v-if="isLoading"
+    class="route-loading p-0 position-fixed top-0 start-0 bottom-0 end-0 w-100 h-100"
+  >
+    <div class="loading-spinner">
+      <img src="../../assets/preloader.gif" alt="slow connection" />
+    </div>
+  </div> -->
 </template>
 
+<script setup>
+import TheSidebar from "./components/TheSidebar.vue";
+import TheHeader from "./components/TheHeader.vue";
+</script>
+
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+.route-loading {
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1;
 }
-
-nav {
-  padding: 30px;
+.sidebar {
+  min-height: 100vh;
+  width: 18em !important;
 }
-
-nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-nav a.router-link-exact-active {
-  color: #42b983;
+.loading-spinner {
+  position: absolute;
+  top: 10%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  /* z-index: 1; */
 }
 </style>
+<style>
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+/* new design change start*/
+tr:last-child {
+  border-bottom: 2px solid hsl(234, 6%, 33%);
+}
+th {
+  text-align: left;
+  padding: 8px;
+}
+tr {
+  border-bottom: 2px solid hsl(233, 6%, 26%);
+}
+td {
+  text-align: left;
+  padding: 8px;
+  vertical-align: top;
+}
+.text-dark-blue {
+  color: #2f4587;
+}
+.bg-dark-blue {
+  background-color: #2f4587;
+}
+.warining input,
+.warining textarea {
+  border: 1px red solid;
+}
+.warining span {
+  display: inline;
+  color: red;
+  font-size: 14px;
+}
+</style>
+

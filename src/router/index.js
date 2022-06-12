@@ -1,25 +1,52 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
-
+import TheDashboard from "../views/TheDashboard"
 const routes = [
   {
     path: '/',
-    name: 'home',
-    component: HomeView
+    name: 'TheDashboard',
+    component: TheDashboard
   },
   {
-    path: '/about',
-    name: 'about',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
-  }
+    path: '/products',
+    name: 'TheProduct',
+    component: () => import(/* webpackChunkName: "product" */ '../views/TheProduct.vue')
+  },
+  {
+    path: '/orders',
+    name: 'TheOrder',
+    component: () => import(/* webpackChunkName: "order" */ '../views/TheOrder.vue')
+  },
+  {
+    path: '/customers',
+    name: 'TheCustomer',
+    component: () => import(/* webpackChunkName: "customer" */ '../views/TheCustomer.vue')
+  },
+  {
+    path: '/revenue',
+    name: 'TheRevenue',
+    component: () => import(/* webpackChunkName: "revenue" */ '../views/TheRevenue.vue')
+  },
+  {
+    path: '/shops',
+    name: 'TheShop',
+    component: () => import(/* webpackChunkName: "shops" */ '../views/TheShop.vue')
+  },
+  {
+    path: '/sales',
+    name: 'TheSales',
+    component: () => import(/* webpackChunkName: "sales" */ '../views/TheSales.vue')
+  },
+  {
+    path: '/setting',
+    name: 'TheSetting',
+    component: () => import(/* webpackChunkName: "setting" */ '../views/TheSetting.vue')
+  },
 ]
 
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
-  routes
+  routes,
+  linkActiveClass: "active",
 })
 
 export default router
