@@ -42,9 +42,14 @@ const routes = [
     component: () => import(/* webpackChunkName: "setting" */ '../views/TheSetting.vue')
   },
   {
-    path: '/product-detail',
+    path: '/product-detail/:id',
     name: 'ProductDetail',
     component: () => import(/* webpackChunkName: "product-detail" */ '../views/ProductDetail.vue')
+  },
+  {
+    path: '/supported-languages',
+    name: 'SupportedLanguage',
+    component: () => import(/* webpackChunkName: "product-detail" */ '../views/SupportedLanguage.vue')
   },
 ]
 

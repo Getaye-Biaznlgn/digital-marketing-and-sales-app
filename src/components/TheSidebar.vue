@@ -2,20 +2,21 @@
   <nav class="navbar-light side-bar">
     <div class="fw-bold fs-5 ps-1 my-2">Menu</div>
     <ul class="navbar-nav pt-2 px-2">
-      <TheSidebar label="Dashboard" routeName="TheDashboard" />
-      <TheSidebar label="Product" routeName="TheProduct" />
-      <TheSidebar label="Order" routeName="TheOrder" />
-      <TheSidebar label="Customer" routeName="TheCustomer" />
-      <TheSidebar label="Shop" routeName="TheShop" />
-      <TheSidebar label="Revenue" routeName="TheRevenue" />
-      <TheSidebar label="Sales" routeName="TheSales" />
-      <TheSidebar label="Setting" routeName="TheSetting" />
+      <TheSidebarItem label="Dashboard" routeName="TheDashboard" />
+      <TheSidebarItem label="Product" routeName="TheProduct" />
+      <TheSidebarItem label="Order" routeName="TheOrder" />
+      <TheSidebarItem label="Customer" routeName="TheCustomer" />
+      <TheSidebarItem label="Shop" routeName="TheShop" />
+      <TheSidebarItem label="Revenue" routeName="TheRevenue" />
+      <TheSidebarItem label="Sales" routeName="TheSales" />
+      <TheSidebarItem label="Setting" routeName="TheSetting" />
+      <TheSidebarItem label="Languages" routeName="SupportedLanguage" />
     </ul>
   </nav>
 </template>
 
 <script setup>
-import TheSidebar from './SidebarItem.vue'
+import TheSidebarItem from './SidebarItem.vue'
 </script>
 
 

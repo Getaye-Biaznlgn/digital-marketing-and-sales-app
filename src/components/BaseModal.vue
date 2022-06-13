@@ -7,12 +7,20 @@
     >
       <div class="modal-body bg-white position-relative rounded mx-auto pt-0">
         <div class="bg-white position-sticky end-0 start-0 top-0">
-          <button
+          <!-- <button
             @click="dismissModal"
             class="btn mt-0 pb-0 fs-5 bg-white ms-auto d-block"
           >
-            <i class="fas fa-times"></i>
-          </button>
+            
+          </button> -->
+          <div class="d-flex justify-content-between">
+               <div>
+                  here
+               </div>
+               <span class="fs-5" role="button" @click="dismissModal">
+                <i class="fas fa-times"></i>
+               </span>
+          </div>
         </div>
        
         <slot></slot>

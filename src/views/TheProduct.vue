@@ -57,14 +57,14 @@
         <th><span class="sr-only">Action</span></th>
       </tr>
       <tr
-        v-for="(product,index) in products"
+        v-for="(product, index) in products"
         :key="product.id"
       >
         <td>{{index+1}}</td>
         <td>{{product.model}}</td>
         <td>
           <img
-            :src="product.images?.[index]?.image_path"
+            :src="product.images?.path"
             width="100"
             height="100"
             alt="product image"
@@ -78,7 +78,7 @@
         <td>{{product.isActive}}</td>
         <td
         >
-          <span class="me-2" @click="$router.push({name:'ProductDetail'})" role="button"
+          <span class="me-2" @click="$router.push({name:'ProductDetail', params:{id:product.id}})" role="button"
             ><i class="far fa-edit"></i
           ></span>
           <span  role="button"
@@ -88,6 +88,19 @@
       </tr>
     </table>
     <add-product-modal :isAddModalVisible="isAddModalVisible" @closeAddModal="closeAddModal"/>
+      <!-- delete base modal -->
+  <base-modal :modalState="isDeleteModalVisible" @close="closeDeleteModal">
+    <strong class="mt-0 fs-5">Delete</strong>
+    <p>Do u want to delete?</p>
+   
+    <base-button
+      class="mt-3"
+      title="Delete"
+      :isLoading="isLoading"
+      loadingTitle="Deleting"
+      @submit="deleteImage"
+    />
+  </base-modal>
 </template>
 
 <script>
@@ -109,6 +122,10 @@ export default {
    var showAddModal= function(){
       isAddModalVisible.value = true;
    }
+
+   const closeDeleteModal= async function(){
+
+   }
    const fetchProducts= async function(){
        try {
         store.commit("setIsLoading", true);
@@ -116,8 +133,7 @@ export default {
           `/api/products`
         );
         if (response.status === 200) {
-           products.value=response.data
-           console.log('products...', products)
+           products.value=response.data.data
         }
       } catch (e) {
         //
@@ -130,7 +146,8 @@ export default {
       isAddModalVisible,
       closeAddModal,
       showAddModal,
-      products
+      products,
+      closeDeleteModal
     }
    },
   
@@ -170,19 +187,7 @@ td {
   padding: 8px;
   vertical-align: top;
 }
-.text-dark-blue {
-  color: #2f4587;
-}
 .btn-bg-primary {
   background-color: #ff7e00;
-}
-.warining input,
-.warining textarea {
-  border: 1px red solid;
-}
-.warining span {
-  display: inline;
-  color: red;
-  font-size: 14px;
 }
 </style>

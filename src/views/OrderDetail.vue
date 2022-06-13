@@ -1,11 +1,9 @@
 <template>
-  ..
+  ll
 </template>
 
 <script>
-export default {
 
-}
 </script>
 
 <style>

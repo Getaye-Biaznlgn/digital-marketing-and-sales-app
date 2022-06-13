@@ -39,3 +39,8 @@ export default {
   },
 };
 </script>
+<style scoped>
+.btn-bg-primary {
+  background-color: #ff7e00;
+}
+</style>
