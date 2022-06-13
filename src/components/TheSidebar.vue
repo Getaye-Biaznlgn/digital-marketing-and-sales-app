@@ -9,8 +9,10 @@
       <TheSidebarItem label="Shop" routeName="TheShop" />
       <TheSidebarItem label="Revenue" routeName="TheRevenue" />
       <TheSidebarItem label="Sales" routeName="TheSales" />
-      <TheSidebarItem label="Setting" routeName="TheSetting" />
+      <TheSidebarItem label="Product Category" routeName="ProductCategory" />
       <TheSidebarItem label="Languages" routeName="SupportedLanguage" />
+      <TheSidebarItem label="Setting" routeName="TheSetting" />
+
     </ul>
   </nav>
 </template>

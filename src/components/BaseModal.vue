@@ -7,31 +7,31 @@
     >
       <div class="modal-body bg-white position-relative rounded mx-auto pt-0">
         <div class="bg-white position-sticky end-0 start-0 top-0">
-          <!-- <button
-            @click="dismissModal"
-            class="btn mt-0 pb-0 fs-5 bg-white ms-auto d-block"
-          >
-            
-          </button> -->
           <div class="d-flex justify-content-between">
-               <div>
-                  here
+               <div class="fw-bold fs-5 py-1">
+                  {{title}}
                </div>
                <span class="fs-5" role="button" @click="dismissModal">
                 <i class="fas fa-times"></i>
                </span>
           </div>
         </div>
-       
+       <div class="mt-3 mb-2">
         <slot></slot>
+       </div>
+        <base-button
+          class="mt-3"
+          :title="btnLabel"
+          :isLoading="isLoading"
+           @submit="$emit('submit')"
+         />
       </div>
     </div>
   </transition>
 </template>
 <script>
 export default {
-  props: ["modalState"],
-
+  props: ["modalState", "title", "btnLabel", "isLoading"],
   methods: {
     dismissModal() {
       this.$emit("close");

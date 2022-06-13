@@ -81,7 +81,7 @@
           <span class="me-2" @click="$router.push({name:'ProductDetail', params:{id:product.id}})" role="button"
             ><i class="far fa-edit"></i
           ></span>
-          <span  role="button"
+          <span  @click="showDeleteModal(product)" role="button"
             ><i class="fas fa-trash"></i
           ></span>
         </td>
@@ -89,43 +89,83 @@
     </table>
     <add-product-modal :isAddModalVisible="isAddModalVisible" @closeAddModal="closeAddModal"/>
       <!-- delete base modal -->
-  <base-modal :modalState="isDeleteModalVisible" @close="closeDeleteModal">
-    <strong class="mt-0 fs-5">Delete</strong>
+  <base-modal :modalState="isDeleteModalVisible"
+   @close="closeDeleteModal"
+    title="Delete Product"
+    btnLabel="Delete" :isLoading="isLoading" @submit="deleteProduct">
     <p>Do u want to delete?</p>
-   
-    <base-button
-      class="mt-3"
-      title="Delete"
-      :isLoading="isLoading"
-      loadingTitle="Deleting"
-      @submit="deleteImage"
-    />
+    <p>{{productForDelete?.name}}</p>
   </base-modal>
+    <the-alert
+    :isVisible="isAlertVisible"
+    message="Faild to delete product"
+    :isSucceed="false"
+  />
 </template>
 
 <script>
 import AddProductModal from '../components/AddProductModal.vue'
 import apiClient from '../resources/baseUrl'
 import {useStore} from 'vuex'
-import { ref} from 'vue';
+import { ref, onBeforeUnmount} from 'vue';
 export default {
  components:{
     AddProductModal
  },
   setup(){
-    const store= useStore();
+   const store= useStore();
    var isAddModalVisible= ref(false);
+   var isDeleteModalVisible= ref(false);
    var products = ref({});
+   var isLoading = ref(false);
+   var productForDelete= ref();
+   var isAlertVisible= ref(false)
+   var timeout = ref(false)
    var closeAddModal= function(){
         isAddModalVisible.value= false
    }
-   var showAddModal= function(){
+   var showAddModal= function(product){
+    productForDelete.value= product
       isAddModalVisible.value = true;
+
+   }
+  var showDeleteModal= function(product){
+      productForDelete.value= product
+      isDeleteModalVisible.value = true;
    }
 
    const closeDeleteModal= async function(){
-
+      isDeleteModalVisible.value=false;
    }
+   const deleteProduct = async function(){
+     isLoading.value = true;
+      try {
+        const response = await apiClient.delete(
+          `/api/products/${productForDelete.value.id}`
+        );
+        if (response.status === 200) {
+          const deletedIndex = this.products.findIndex(
+            (product) => {
+              return product.id === this.productForDelete.id;
+            }
+          );
+          this.products.splice(deletedIndex, 1);
+          this.closeDeleteModal();
+        }
+      } catch (e) {
+        isAlertVisible.value=true
+      } finally {
+        isDeleteModalVisible.value=false;
+        isLoading.value = false;
+        dismissAlert();
+      }
+   }
+   const dismissAlert= function() {
+     timeout.value = setTimeout(() => {
+      isAlertVisible.value = false;
+      }, 2000);
+   }
+
    const fetchProducts= async function(){
        try {
         store.commit("setIsLoading", true);
@@ -142,12 +182,22 @@ export default {
       }
    }
    fetchProducts()
+   onBeforeUnmount(function(){
+    clearTimeout(timeout)
+   })
     return {
-      isAddModalVisible,
       closeAddModal,
       showAddModal,
+      closeDeleteModal,
+      deleteProduct,
+      showDeleteModal,
+      isAlertVisible,
+      isAddModalVisible,
+      isDeleteModalVisible,
+      productForDelete,
       products,
-      closeDeleteModal
+      isLoading,
+      
     }
    },
   

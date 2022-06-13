@@ -22,7 +22,6 @@
       class="mt-3"
       title="Upload images"
       :isLoading="isImageUploading"
-      loadingTitle="Uploading"
       @submit="uploadNewImages"
     />
   </base-card>

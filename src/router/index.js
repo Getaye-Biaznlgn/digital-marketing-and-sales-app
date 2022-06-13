@@ -49,7 +49,12 @@ const routes = [
   {
     path: '/supported-languages',
     name: 'SupportedLanguage',
-    component: () => import(/* webpackChunkName: "product-detail" */ '../views/SupportedLanguage.vue')
+    component: () => import(/* webpackChunkName: "supported language" */ '../views/SupportedLanguage.vue')
+  },
+  {
+    path: '/product-category',
+    name: 'ProductCategory',
+    component: () => import(/* webpackChunkName: "product category" */ '../views/ProductCategory.vue')
   },
 ]
 

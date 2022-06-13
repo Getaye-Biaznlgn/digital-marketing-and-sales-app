@@ -11,11 +11,9 @@
           role="status"
           aria-hidden="true"
         ></span>
-        <span>{{ loadingTitle }}</span>
       </span>
-      <span v-else>{{ title }}</span>
+      <span>{{ title }}</span>
     </button>
-    <p class="text-danger text-center small">{{ errorMessage }}</p>
   </div>
 </template>
 <script>
@@ -23,18 +21,11 @@ export default {
   props: {
     isLoading: {
       type: Boolean,
-      required: true,
+      default:false
     },
     title: {
       type: String,
-      default: "Submit",
-    },
-    loadingTitle: {
-      type: String,
-      default: "Submiting",
-    },
-    errorMessage: {
-      type: String,
+      default: "OK",
     },
   },
 };

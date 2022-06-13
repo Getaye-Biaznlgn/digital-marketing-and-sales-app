@@ -1,6 +1,7 @@
 <template>
   <!-- Add product modal -->
-  <base-modal :modalState="isAddModalVisible" @close="closeAddModel">
+  <base-modal :modalState="isAddModalVisible" title="Add Product" @close="closeAddModel" btnLabel="Save" 
+  :isLoading="isLoading" @submit="addNewProduct">
     <form @submit.prevent>
       <div class="mb-3" :class="{ warining: v$.product.name.$error }">
         <label for="name" class="form-label">Name</label>
@@ -74,9 +75,9 @@
         >
       </div>
 <!--  -->
-  <div class="d-flex justify-content-between">
+  <div class="row">
       <!--  -->
-      <div class="mb-3" :class="{ warining: v$.product.warranty.$error }">
+      <div class="mb-3 col-md-6" :class="{ warining: v$.product.warranty.$error }">
         <label for="name" class="form-label">Warranty</label>
         <input
           type="text"
@@ -93,7 +94,7 @@
           {{ error.$message + ", " }}</span
         >
       </div>
-       <div class="mb-3" :class="{ warining: v$.product.qty.$error }">
+       <div class="mb-3 col-md-6" :class="{ warining: v$.product.qty.$error }">
         <label for="brand" class="form-label">Quantity</label>
         <input
           type="number"
@@ -263,14 +264,6 @@
           aria-valuemax="100"
         ></div>
       </div>
-      <base-button
-        class="mt-3"
-        title="Save"
-        :isLoading="isLoading"
-        :errorMessage="errorMessage"
-        loadingTitle="Saving"
-        @submit="addNewProduct"
-      />
     </form>
   </base-modal>
   <!-- End add product modal -->

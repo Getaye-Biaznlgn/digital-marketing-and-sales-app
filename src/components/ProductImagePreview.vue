@@ -24,8 +24,8 @@
   </base-card>
 
     <!-- delete base modal -->
-  <base-modal :modalState="isDeleteModalVisible" @close="closeDeleteModal">
-    <strong class="mt-0 fs-5">Delete</strong>
+  <base-modal :modalState="isDeleteModalVisible" btnLabel="Delete" :isLoading="isLoading"
+   title="Delete Image" @close="closeDeleteModal" @submit="deleteImage">
     <p>Do u want to delete?</p>
     <img
       :src="imageForDelete?.path"
@@ -34,13 +34,7 @@
       class="d-block mx-auto"
       alt="Selected image"
     />
-    <base-button
-      class="mt-3"
-      title="Delete"
-      :isLoading="isLoading"
-      loadingTitle="Deleting"
-      @submit="deleteImage"
-    />
+    
   </base-modal>
   <!--to show delete image is failed  -->
   <the-alert

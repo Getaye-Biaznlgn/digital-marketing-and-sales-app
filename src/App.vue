@@ -9,7 +9,6 @@
     </div>
   </div>
 
-
   <div
     v-if="store.getters.isLoading"
     class="route-loading p-0 position-fixed top-0 start-0 bottom-0 end-0 w-100 h-100"
@@ -25,7 +24,7 @@ import TheSidebar from "./components/TheSidebar.vue";
 import TheHeader from "./components/TheHeader.vue";
 import {useStore} from 'vuex'
 const store = useStore()
-store.dispatch('fetchCategories');
+// store.dispatch('fetchCategories');
 </script>
 
 <style>
@@ -44,8 +43,7 @@ store.dispatch('fetchCategories');
   transform: translate(-50%, -50%);
   /* z-index: 1; */
 }
-</style>
-<style>
+
 table {
   border-collapse: collapse;
   width: 100%;
@@ -66,9 +64,7 @@ td {
   padding: 8px;
   vertical-align: top;
 }
-.text-dark-blue {
-  color: #2f4587;
-}
+
 .btn-bg-primary {
   background-color: #ff7e00;
 }
@@ -82,4 +78,5 @@ td {
   font-size: 14px;
 }
 </style>
+
 
