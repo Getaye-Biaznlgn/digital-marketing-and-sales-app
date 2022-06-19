@@ -3,7 +3,13 @@
     <div>
       <strong class="fw-bold text-light"><span class="brand-color1">RENSYS </span> <span class="brand-color2">ENGINEERING</span></strong>
     </div>
-    <div class="fs-5"></div>
+          <div class="d-flex text-light">
+             <span class="align-self-center text-white px-1 rounded mx-2"><i class="fas fa-user fs-4 fw-bold"></i></span>         
+         <div class="d-flex flex-column">
+             <span class="fw-bold small text-center">Suzan Gebrewold</span>
+             <span class="small">Marketing</span>
+          </div>
+    </div>
   </nav>
 </template>
 <style scoped>

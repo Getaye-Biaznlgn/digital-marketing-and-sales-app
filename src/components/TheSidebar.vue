@@ -7,6 +7,7 @@
       <TheSidebarItem label="Order" routeName="TheOrder" />
       <TheSidebarItem label="Customer" routeName="TheCustomer" />
       <TheSidebarItem label="Shop" routeName="TheShop" />
+      <TheSidebarItem label="Agents" routeName="TheAgent" />
       <TheSidebarItem label="Revenue" routeName="TheRevenue" />
       <TheSidebarItem label="Sales" routeName="TheSales" />
       <TheSidebarItem label="Product Category" routeName="ProductCategory" />

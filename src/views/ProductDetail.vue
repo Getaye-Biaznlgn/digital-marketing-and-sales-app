@@ -1,10 +1,17 @@
 <template>
-<ProductUpdateForm :productInfo="{...product}"/>
+<div class="bg-light-grey p-2">
+ <span
+       @click="$router.back()"
+       role="button"
+       class="text-dark-blue pe-2 fw-bold fs-5"
+       ><i class="fas fa-arrow-left"></i>Back</span
+     >
+<ProductUpdateForm  :productInfo="{...product}"/>
 <ProductImagePreview :productInfo="{...product}"/>
   <!-- add new Image -->
   <base-card>
     <div class="fs-5 mb-2 fw-bold">Add More Images</div>
-    <multiple-image-upload @saveImage="setNewImages" />
+<multiple-image-upload @saveImage="setNewImages" />
 <transition>
     <div v-if="newImages.length" class="progress mt-3">
       <div
@@ -18,14 +25,14 @@
       ></div>
     </div>
 </transition>   
-    <base-button
+  <base-button
       class="mt-3"
       title="Upload images"
       :isLoading="isImageUploading"
       @submit="uploadNewImages"
     />
-  </base-card>
-
+  </base-card>  
+  </div>
  <!-- alert  -->
   <the-alert
     :isVisible="isAlertVisible"
@@ -62,6 +69,7 @@ export default{
     setNewImages(img){
        this.newImages=img
     },
+  
      dismissAlert() {
       this.timeout = setTimeout(() => {
         this.isAlertVisible = false;
@@ -102,7 +110,22 @@ export default{
         this.dismissAlert();
       }
     },
-
+// product_translations
+    // async fetchProductBasedOnLanguage(){
+    //    try {
+    //     this.$store.commit("setIsLoading", true);
+    //     const response = await apiClient.get(
+    //       `/api/product_translations/${this.$route.params.id}?language=${this.selectedLanguage}`
+    //     );
+    //     if (response.status === 200) {
+    //       this.product = response.data.data;
+    //     }
+    //   } catch (e) {
+    //     //
+    //   } finally {
+    //     this.$store.commit("setIsLoading", false);
+    //   }
+    // },
     async fetchProduct () {
       try {
         this.$store.commit("setIsLoading", true);
@@ -111,7 +134,6 @@ export default{
         );
         if (response.status === 200) {
           this.product = response.data.data;
-
         }
       } catch (e) {
         //
@@ -119,7 +141,7 @@ export default{
         this.$store.commit("setIsLoading", false);
       }
    },
-    
+ 
  },
    created(){
     this.fetchProduct()
@@ -133,6 +155,10 @@ export default{
 </script>
 
 <style>
+.bg-light-grey {
+  background-color: #f1f1f1;
+  min-height: 100vh;
+}
 .v-enter-from {
   opacity: 0;
 }

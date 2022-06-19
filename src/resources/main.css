@@ -1,0 +1,43 @@
+.search-input {
+  border-bottom-right-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+}
+.selection-bar {
+  background-color: rgb(250, 250, 250);
+}
+.input-group {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+  /* new design change start*/
+  tr:last-child {
+    border-bottom: 2px solid #f1f1f1;
+  }
+  th {
+    text-align: left;
+    padding: 8px;
+  }
+  tr {
+    border-bottom: 2px solid #f1f1f1;
+  }
+  td {
+    text-align: left;
+    padding: 8px;
+    vertical-align: top;
+  }
+  .btn-bg-primary {
+    background-color: #ff7e00;
+  }
+  button:hover{
+    background-color: #ff7e00;
+    color: #fff;
+  }
+input[type="checkbox"]:checked{
+ background-color: #ff7e00;
+ border: none;
+}

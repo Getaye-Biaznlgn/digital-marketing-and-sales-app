@@ -4,7 +4,7 @@
     <div class="sidebar shadow">
       <the-sidebar></the-sidebar>
     </div>
-    <div class="container-fluid position-relative ">
+    <div class="container-fluid position-relative px-0">
       <router-view></router-view>
     </div>
   </div>
@@ -24,7 +24,7 @@ import TheSidebar from "./components/TheSidebar.vue";
 import TheHeader from "./components/TheHeader.vue";
 import {useStore} from 'vuex'
 const store = useStore()
-// store.dispatch('fetchCategories');
+store.dispatch('fetchCategories');
 </script>
 
 <style>
@@ -38,7 +38,7 @@ const store = useStore()
 }
 .loading-spinner {
   position: absolute;
-  top: 10%;
+  top: 30%;
   left: 50%;
   transform: translate(-50%, -50%);
   /* z-index: 1; */

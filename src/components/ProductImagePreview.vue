@@ -1,6 +1,7 @@
 <template>
     <!-- image view components -->
   <base-card>
+   <div class="fs-5 mb-2 fw-bold">Product Images</div>
     <div class="row g-4 p-3">
       <div
         v-for="img in product.images"
@@ -91,10 +92,11 @@ export default {
         }
       } catch (e) {
         this.isAlertVisible=true
+        this.dismissAlert();
       } finally {
         this.isLoading = false;
         this.closeDeleteModal();
-        this.dismissAlert();
+        
       }
     },
     

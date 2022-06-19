@@ -56,6 +56,26 @@ const routes = [
     name: 'ProductCategory',
     component: () => import(/* webpackChunkName: "product category" */ '../views/ProductCategory.vue')
   },
+  {
+    path: '/add-shop',
+    name: 'AddShop',
+    component: () => import(/* webpackChunkName: "add-shop" */ '../views/AddShop.vue')
+  },
+  {
+    path: '/add-product',
+    name: 'AddProduct',
+    component: () => import(/* webpackChunkName: "add-product" */ '../views/AddProduct.vue')
+  },
+  {
+    path: '/shop-detail/:id',
+    name: 'ShopDetail',
+    component: () => import(/* webpackChunkName: "shop-detail" */ '../views/ShopDetail.vue')
+  },
+  {
+    path: '/agents',
+    name: 'TheAgent',
+    component: () => import(/* webpackChunkName: "shop-detail" */ '../views/TheAgent.vue')
+  },
 ]
 
 const router = createRouter({
