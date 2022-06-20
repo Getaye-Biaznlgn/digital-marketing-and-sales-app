@@ -14,7 +14,7 @@
     </button>
     <hr />
     <div class="d-flex justify-content-between p-2 selection-bar">
-      <div class="d-flex border rounded">
+      <div class="d-flex rounded-pill">
         <input
           type="text"
           class="form-control search-input"
@@ -118,7 +118,7 @@
 import apiClient from "../resources/baseUrl";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
-import { ref, onBeforeUnmount } from "vue";
+import { ref, onBeforeUnmount, computed } from "vue";
 export default {
   components: {
   },
@@ -126,12 +126,12 @@ export default {
     const store = useStore();
     const router = useRouter();
     var isDeleteModalVisible = ref(false);
-    var products = ref({});
+    const products= computed(()=>store.getters.products)
     var isLoading = ref(false);
     var productForDelete = ref();
     var isAlertVisible = ref(false);
     var timeout = ref(false);
- 
+   
     var showAddModal = function () {
       router.push({ name: "AddProduct" });
       // productForDelete.value= product
@@ -171,21 +171,7 @@ export default {
         isAlertVisible.value = false;
       }, 2000);
     };
-    const fetchProducts = async function () {
-      try {
-        store.commit("setIsLoading", true);
-        const response = await apiClient.get(`/api/products`);
-        if (response.status === 200) {
-          products.value = response.data.data;
-        }
-      } catch (e) {
-        //
-      } finally {
-        store.commit("setIsLoading", false);
-      }
-    };
 
-    fetchProducts();
     onBeforeUnmount(function () {
       clearTimeout(timeout);
     });

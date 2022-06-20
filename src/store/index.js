@@ -3,7 +3,8 @@ import apiClient from '@/resources/baseUrl';
 export default createStore({
   state: {
     isLoading:false,
-    categories:[]
+    categories:[],
+    products:[]
   },
   getters: {
     isLoading(state){
@@ -11,6 +12,9 @@ export default createStore({
     },
     categories(state){
       return state.categories
+    },
+    products(state){
+      return state.products
     }
   },
   mutations: {
@@ -19,6 +23,9 @@ export default createStore({
     },
     setCategories(state, payload){
       state.categories= payload
+    },
+    setProducts(state, payload){
+      state.products= payload
     }
   },
   actions: {
@@ -32,6 +39,20 @@ export default createStore({
           console.log('categories', context.state.categories)
         } else {
           throw "faild to load categories";
+        }
+      } finally {
+        context.commit("setIsLoading", false);
+      }
+    },
+    async fetchProducts(context) {
+      context.commit("setIsLoading", true);
+      context.isLoading = true;
+      try {
+        var response = await apiClient.get("/api/products");
+        if (response.status === 200) {
+          context.commit("setProducts", response.data.data);
+        } else {
+          throw "faild to load products";
         }
       } finally {
         context.commit("setIsLoading", false);

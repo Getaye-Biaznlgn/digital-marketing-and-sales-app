@@ -25,6 +25,7 @@ import TheHeader from "./components/TheHeader.vue";
 import {useStore} from 'vuex'
 const store = useStore()
 store.dispatch('fetchCategories');
+store.dispatch('fetchProducts')
 </script>
 
 <style>

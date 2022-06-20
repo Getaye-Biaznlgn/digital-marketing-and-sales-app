@@ -46,7 +46,7 @@
       </button>
       <hr />
       <keep-alive>
-        <component :shopId="$route.params.id" :allProducts="allProducts" :shopProducts="shop.products" :is="selectedComponent"/> 
+        <component :shopId="$route.params.id" @newProductAdded="addPendingProduct" :pendingProducts="pendingProducts" :allProducts="allProducts" :shopProducts="shop.products" :is="selectedComponent"/> 
       </keep-alive>
              
     </div>
@@ -67,9 +67,15 @@ export default {
   data() {
     return {
       shop: {},
-      allProducts:[],
+      // allProducts:[],
+      pendingProducts:[],
       selectedComponent:"ShopProduct",
     };
+  },
+  computed:{
+   allProducts(){
+    return this.$store.getters.products
+   }
   },
   methods: {
     showSendProductModal(){
@@ -77,7 +83,9 @@ export default {
       this.selectedComponent='ShopDistribution'
         // this.isSendProductModalVisible=true;
     },
- 
+    addPendingProduct(value){
+       this.pendingProducts=[...value,...this.pendingProducts]
+    },
     async fetchShopProduct() {
       try {
         this.$store.commit("setIsLoading", true);
@@ -93,14 +101,14 @@ export default {
         this.$store.commit("setIsLoading", false);
       }
     },
-    async fetchAllProducts() {
+      async fetchPendingProduct() {
       try {
         this.$store.commit("setIsLoading", true);
         const response = await apiClient.get(
-          `/api/products`
+          `/api/product_distribution_data/${this.$route.params.id}`
         );
         if (response.status === 200) {
-          this.allProducts = response.data.data;
+          this.pendingProducts = response.data.data;
         }
       } catch (e) {
         //
@@ -108,10 +116,26 @@ export default {
         this.$store.commit("setIsLoading", false);
       }
     },
+    // async fetchAllProducts() {
+    //   try {
+    //     this.$store.commit("setIsLoading", true);
+    //     const response = await apiClient.get(
+    //       `/api/products`
+    //     );
+    //     if (response.status === 200) {
+    //       this.allProducts = response.data.data;
+    //     }
+    //   } catch (e) {
+    //     //
+    //   } finally {
+    //     this.$store.commit("setIsLoading", false);
+    //   }
+    // },
   },
   created() {
     this.fetchShopProduct();
-    this.fetchAllProducts();
+    // this.fetchAllProducts();
+    this.fetchPendingProduct();
   },
 };
 </script>
