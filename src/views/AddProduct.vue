@@ -365,6 +365,7 @@ export default {
           });
           if (response.status === 201) {
             this.product_images = [];
+
             this.setAlertData(true, 'Product is uploaded successfully.');
           } else throw "";
         } catch (e) {

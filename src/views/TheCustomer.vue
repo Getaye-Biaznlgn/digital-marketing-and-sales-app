@@ -1,15 +1,18 @@
 <template>
-<div class="m-3">
-  <h5>Product customer</h5>
-  <div>
-    In the customer section, you will review and manage 
-    all solar product customers.
-  </div>
-   <button @click="showAddModal" class="btn ms-auto d-flex justify-self-end btn-bg-primary text-light">
-        Add New Customer
-   </button>
-<hr/>
- <div class="d-flex justify-content-between p-2 selection-bar">
+  <div class="m-3">
+    <h5>Product customer</h5>
+    <div>
+      In the customer section, you will review and manage all solar product
+      customers.
+    </div>
+    <button
+      @click="showAddModal"
+      class="btn ms-auto d-flex justify-self-end btn-bg-primary text-light"
+    >
+      Add New Customer
+    </button>
+    <hr />
+    <div class="d-flex justify-content-between p-2 selection-bar">
       <div class="d-flex bcustomer rounded">
         <input
           type="text"
@@ -42,254 +45,377 @@
         </div>
       </div>
     </div>
-  <!-- Table -->
-      <table class="mt-2">
+    <!-- Table -->
+    <table class="mt-2">
       <tr>
         <th>No</th>
-        <th>Id</th>
-        <th>Customer</th>
-        <th>customer</th>
-         <th>Qty</th>
-         <th>customer Date</th>
-         <th>Shop</th>
-         <th>customer Status</th>
-         <th>Payment Method</th>
+        <th>Full name</th>
+        <th>Phone number</th>
+        <th>Joined date</th>
+        <th>Location</th>
+        <th>Status</th>
         <th><span class="sr-only">Action</span></th>
       </tr>
-      <tr v-for="(customer, index) in customers"
-        :key="customer.id">
-        <td>{{index+1}}</td>
-        <td>{{customer.id}}</td>
-        <td>{{customer}}</td>
+      <tr v-for="(customer, index) in customers" :key="customer.id">
+        <td>{{ index + 1 }}</td>
+        <td class="text-capitalize">
+          {{ customer.first_name + " " + customer.last_name }}
+        </td>
+        <td>{{ customer.phone_number }}</td>
+        <td >
+          <span v-if="customer.joined_date">{{ customer.joined_date }}</span
+          ><span v-else>--/--</span>
+        </td>
+        <td>{{ customer.region + " / " + customer.woreda }}</td>
         <td>
           <span class="me-2" @click="showEditModal(customer)" role="button"
             ><i class="far fa-edit"></i
           ></span>
-          <span  @click="showDeleteModal(customer)" role="button"
+          <span @click="showDeleteModal(customer)" role="button"
             ><i class="fas fa-trash"></i
           ></span>
         </td>
       </tr>
     </table>
-</div>
-    <!-- add customers -->
-<base-modal :modalState="isAddModalVisible" title="Customer" @close="closeAddModal" btnLabel="Save" 
-  :isLoading="isLoading" @submit="addNewCustomer">
-     <form @submit.prevent>
-      <div class="mb-3" :class="{ warining: v$.customer.title.$error }">
-        <label for="title" class="form-label">Name</label>
+  </div>
+  <!-- add customers -->
+  <base-modal
+    :modalState="isAddModalVisible"
+    title="Customer"
+    @close="closeAddModal"
+    btnLabel="Save"
+    :isLoading="isLoading"
+    @submit="addNewCustomer"
+  >
+    <form @submit.prevent>
+      <div class="row">
+        <div
+          class="mb-1 col-md-6"
+          :class="{ warining: v$.customer.first_name.$error }"
+        >
+          <label for="firstName" class="form-label">First Name</label>
+          <input
+            type="text"
+            class="form-control"
+            id="firstName"
+            v-model.trim="customer.first_name"
+            @blur="v$.customer.first_name.$touch"
+          />
+          <span
+            class="error-msg mt-1"
+            v-for="(error, index) of v$.customer.first_name.$errors"
+            :key="index"
+          >
+            {{ error.$message + ", " }}</span
+          >
+        </div>
+        <div
+          class="mb-1 col-md-6"
+          :class="{ warining: v$.customer.last_name.$error }"
+        >
+          <label for="last_name" class="form-label">Last Name</label>
+          <input
+            type="text"
+            class="form-control"
+            id="last_name"
+            v-model.trim="customer.last_name"
+            @blur="v$.customer.last_name.$touch"
+          />
+          <span
+            class="error-msg mt-1"
+            v-for="(error, index) of v$.customer.last_name.$errors"
+            :key="index"
+          >
+            {{ error.$message + ", " }}</span
+          >
+        </div>
+      </div>
+
+      <div class="mb-1" :class="{ warining: v$.customer.phone_number.$error }">
+        <label for="phone_number" class="form-label">Phone Number</label>
         <input
           type="text"
           class="form-control"
-          id="title"
-          v-model.trim="customer.title"
-          @blur="v$.customer.title.$touch"
+          id="phone_number"
+          v-model.trim="customer.phone_number"
+          @blur="v$.customer.phone_number.$touch"
         />
         <span
           class="error-msg mt-1"
-          v-for="(error, index) of v$.customer.title.$errors"
+          v-for="(error, index) of v$.customer.phone_number.$errors"
           :key="index"
         >
           {{ error.$message + ", " }}</span
         >
       </div>
 
-      <div class="mb-3" :class="{ warining: v$.customer.description.$error }">
-        <label for="description" class="form-label">Description</label>
-        <textarea
-        rows="5"
+      <div class="mb-1" :class="{ warining: v$.customer.email.$error }">
+        <label for="email" class="form-label">Email</label>
+        <input
+          type="text"
           class="form-control"
-          id="description"
-          v-model.trim="customer.description"
-          @blur="v$.customer.description.$touch"
+          id="email"
+          v-model.trim="customer.email"
+          @blur="v$.customer.email.$touch"
         />
         <span
           class="error-msg mt-1"
-          v-for="(error, index) of v$.customer.description.$errors"
+          v-for="(error, index) of v$.customer.email.$errors"
           :key="index"
         >
           {{ error.$message + ", " }}</span
         >
       </div>
-     </form>
+
+      <div class="mb-1">
+        <label for="region" class="form-label">Region</label>
+        <input
+          type="text"
+          class="form-control"
+          id="region"
+          v-model.trim="customer.region"
+        />
+      </div>
+
+      <div class="mb-1">
+        <label for="zone" class="form-label">Zone</label>
+        <input
+          type="text"
+          class="form-control"
+          id="zone"
+          v-model.trim="customer.zone"
+          @blur="v$.customer.zone.$touch"
+        />
+      </div>
+
+      <div class="mb-1">
+        <label for="woreda" class="form-label">Woreda</label>
+        <input
+          type="text"
+          class="form-control"
+          id="woreda"
+          v-model.trim="customer.woreda"
+        />
+      </div>
+    </form>
   </base-modal>
 
   <!-- delete base modal -->
-  <base-modal :modalState="isDeleteModalVisible" btnLabel="Delete" :isLoading="isLoading"
-   title="Delete Image" @close="closeDeleteModal" @submit="deleteCustomer">
-    <p>Do u want to delete? <br>
-     {{customerForDelete?.title}}
+  <base-modal
+    :modalState="isDeleteModalVisible"
+    btnLabel="Delete"
+    :isLoading="isLoading"
+    title="Delete Image"
+    @close="closeDeleteModal"
+    @submit="deleteCustomer"
+  >
+    <p>
+      Do u want to delete? <br />
+      {{ customerForDelete?.title }}
     </p>
   </base-modal>
-  
-    <!--to show delete image is failed  -->
+
+  <!--to show delete image is failed  -->
   <the-alert
     :isVisible="isAlertVisible"
     :message="alertMessage"
-    :isSucceed="false"
+    :isSucceed="isRequestSucceed"
   />
 </template>
 
 <script>
-import apiClient from '../resources/baseUrl'
+import apiClient from "../resources/baseUrl";
 import useValidate from "@vuelidate/core";
-import { required, helpers } from "@vuelidate/validators";
+import {
+  required,
+  helpers,
+  email,
+  maxLength,
+  numeric,
+} from "@vuelidate/validators";
 export default {
-    data(){
-        return{
-            v$:useValidate(),
-            isAddModalVisible:false,
-            isDeleteModalVisible:false,
-            customerForDelete:{},
-            alertMessage:'',
-            
-            isLoading: false,
-            customers:[],
-            customer:{
-                title:'',
-                description:''
-            },
-            // alert
-            isAlertVisible:false,
-            timeout: '',
-            // to use add modal as edit depend on the condition and #forUpdate to 
-            //chage the action which should be performed 
-            forUpdate:false,
-        }
-    },
-    methods:{
-       dismissAlert() {
+  data() {
+    return {
+      v$: useValidate(),
+      isAddModalVisible: false,
+      isDeleteModalVisible: false,
+      customerForDelete: {},
+
+      isLoading: false,
+      customers: [],
+      customer: {
+        first_name: "",
+        last_name: "",
+        phone_number: "",
+        email: "",
+        region: "",
+        zone: "",
+        woreda: "",
+      },
+      // alert
+      isAlertVisible: false,
+      alertMessage: "",
+      isRequestSucceed: "",
+      timeout: "",
+      //
+      // to use add modal as edit depend on the condition and #forUpdate to
+      //chage the action which should be performed
+      forUpdate: false,
+    };
+  },
+  methods: {
+    dismissAlert() {
       this.timeout = setTimeout(() => {
         this.isAlertVisible = false;
       }, 2000);
     },
-     resetFieldEmpity(){
-      this.customer.title='',
-      this.customer.description=''
-     },
-     showDeleteModal({...customer}){
-      this.customerForDelete=customer
-       this.isDeleteModalVisible=true
-     },
-     closeDeleteModal(){
-       this.isDeleteModalVisible=false
-     },
-     showEditModal({...customer}){
-       this.forUpdate=true;
-        this.customer=customer
-        this.isAddModalVisible=true
-     },
-       closeAddModal(){
-          this.v$.$reset()
-          this.resetFieldEmpity()
-          this.isAddModalVisible=false
-         },
-         showAddModal(){
-            this.isAddModalVisible=true
-         },
-    async updateCustomer(){
+    resetFieldEmpity() {
+      this.customer={
+        first_name: "",
+        last_name: "",
+        phone_number: "",
+        email: "",
+        region: "",
+        zone: "",
+        woreda: "",
+      }
+    },
+    showDeleteModal({ ...customer }) {
+      this.customerForDelete = customer;
+      this.isDeleteModalVisible = true;
+    },
+    closeDeleteModal() {
+      this.isDeleteModalVisible = false;
+    },
+    showEditModal({ ...customer }) {
+      this.forUpdate = true;
+      this.customer = customer;
+      this.isAddModalVisible = true;
+    },
+    closeAddModal() {
+      this.v$.$reset();
+      this.resetFieldEmpity();
+      this.isAddModalVisible = false;
+    },
+    showAddModal() {
+      this.forUpdate = false;
+      this.isAddModalVisible = true;
+    },
+    setAlertData(isRequestSucceed, message) {
+      this.isAlertVisible = true;
+      this.alertMessage = message;
+      this.isRequestSucceed = isRequestSucceed;
+    },
+    async updateCustomer() {
       this.v$.$validate();
       if (!this.v$.$error) {
         this.isLoading = true;
         try {
-          const response = await apiClient.put(`/api/customers/${this.customer.id}`, this.customer);
+          const response = await apiClient.put(
+            `/api/users/${this.customer.id}`,
+            this.customer
+          );
           if (response.status === 200) {
             const editedIndex = this.customers.findIndex((customer) => {
               return this.customer.id === customer.id;
             });
             this.customers[editedIndex] = response.data;
+            this.setAlertData(true, "Customer updated successfully");
             ///
           } else throw "";
         } catch (e) {
-           this.alertMessage="Faild to update customer"
-           this.isAlertVisible=true
-           this.dismissAlert();
+          this.setAlertData(false, "Faild to update customer");
         } finally {
           this.isLoading = false;
           this.closeAddModal();
-          this.forUpdate=false;
+          this.dismissAlert();
+          this.forUpdate = false;
         }
       }
-         },
-     async addNewCustomer(){
-      if(this.forUpdate){
+    },
+    async addNewCustomer() {
+      if (this.forUpdate) {
         this.updateCustomer();
         return;
       }
-        
       this.v$.$validate();
       if (!this.v$.$error) {
         this.isLoading = true;
         try {
-          const response = await apiClient.post("/api/customers", this.customer);
+          const response = await apiClient.post("/api/users", this.customer);
           if (response.status === 201) {
             this.customers.push(response.data);
+            this.setAlertData(true, "You have added customers successfully");
           } else throw "";
         } catch (e) {
-             this.isAlertVisible=true
-             this.alertMessage="Faild to add a new customer"
-             this.dismissAlert();
+          this.setAlertData(false, "Faild to add a new customer");
         } finally {
           this.isLoading = false;
+          this.dismissAlert();
           this.closeAddModal();
         }
       }
-   },
-   async deleteCustomer(){
-        this.isLoading = true;
+    },
+    async deleteCustomer() {
+      this.isLoading = true;
       try {
         const response = await apiClient.delete(
           `/api/customers/${this.customerForDelete.id}`
         );
         if (response.status === 200) {
-          const deletedIndex = this.customers.findIndex((customer)=> {
+          const deletedIndex = this.customers.findIndex((customer) => {
             return customer.id === this.customerForDelete.id;
           });
-          this.customers.splice(deletedIndex, 1);     
+          this.customers.splice(deletedIndex, 1);
         }
       } catch (e) {
-        this.isAlertVisible=true
-        this.alertMessage="Faild to delete a new customer"
+        this.isAlertVisible = true;
+        this.alertMessage = "Faild to delete a new customer";
         this.dismissAlert();
       } finally {
         this.isLoading = false;
         this.closeDeleteModal();
-        
       }
-   },
-     async fetchCustomers(){
-       try {
+    },
+    async fetchCustomers() {
+      try {
         this.$store.commit("setIsLoading", true);
-        const response = await apiClient.get(
-          `/api/customers`
-        );
+        const response = await apiClient.get(`/api/users`);
         if (response.status === 200) {
-           this.customers=response.data
+          this.customers = response.data.data;
         }
       } catch (e) {
         //
       } finally {
         this.$store.commit("setIsLoading", false);
-      }  
-   }
- },
- created(){
-   this.fetchCustomers()
- },
-   beforeUnmount(){
-    clearTimeout(this.timeout)
-   },
-   validations() { 
+      }
+    },
+  },
+  created() {
+    this.fetchCustomers();
+  },
+  beforeUnmount() {
+    clearTimeout(this.timeout);
+  },
+  validations() {
     return {
       customer: {
-        title: {
-          required: helpers.withMessage('customer title is required', required),
+        first_name: {
+          required: helpers.withMessage("First name is required", required),
         },
-        description:{
-            required: helpers.withMessage('customer description is required', required),
-        }
-      }
-    }
-  }
-}
+        last_name: {
+          required: helpers.withMessage("Last name is required", required),
+        },
+        phone_number: {
+          numeric,
+          max: maxLength(10),
+          required: helpers.withMessage("Phone number is required", required),
+        },
+        email: {
+          email,
+        },
+      },
+    };
+  },
+};
 </script>

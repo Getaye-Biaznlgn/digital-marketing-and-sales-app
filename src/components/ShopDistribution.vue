@@ -69,7 +69,7 @@
             class="p-0"
             @blur="setValue(product.id, $event)"
             name="qty"
-            :id="'qty' + key"
+            :id="'qty' +index "
           />
         </div>
         <!-- <button @click="addProduct({product_id:product.id, qty})" class="btn btn-primary text-light" >Add</button> -->

@@ -17,7 +17,7 @@
       <div class="d-flex rounded-pill">
         <input
           type="text"
-          class="form-control search-input"
+          class="form-control search-input "
           placeholder="Search"
           aria-label="search"
           aria-describedby="basic-addon2"
@@ -62,7 +62,7 @@
     </tr>
     <tr v-for="(product, index) in products" :key="product.id">
       <td>{{ index + 1 }}</td>
-      <td>{{ product.model }}</td>
+      <td style="white-space: nowrap;">{{ product.model }}</td>
       <td>
         <img
           :src="product.images?.path"
@@ -131,7 +131,7 @@ export default {
     var productForDelete = ref();
     var isAlertVisible = ref(false);
     var timeout = ref(false);
-   
+    
     var showAddModal = function () {
       router.push({ name: "AddProduct" });
       // productForDelete.value= product
@@ -175,6 +175,7 @@ export default {
     onBeforeUnmount(function () {
       clearTimeout(timeout);
     });
+    store.dispatch('fetchProducts')
     return {
       showAddModal,
       closeDeleteModal,
