@@ -12,22 +12,19 @@
       Add New Customer
     </button>
     <hr />
-    <div class="d-flex justify-content-between p-2 selection-bar">
-      <div class="d-flex bcustomer rounded">
+    <div class="d-flex p-2 justify-content-between selection-bar">
+    <div class="position-relative w-50  me-2">
         <input
           type="text"
-          class="form-control search-input"
-          placeholder="Search"
-          aria-label="search"
-          aria-describedby="basic-addon2"
+          v-model="searchValue"
+          class="form-control rounded-pill pe-5"
+          placeholder="Search by name"
+          aria-label="Recipient's username"
+          aria-describedby="basic-add"
         />
-        <span
-          role="button"
-          class="input-group-text search rounded-0"
-          id="basic-addon2"
-        >
-          <i class="fas fa-search"></i>
-        </span>
+        <span role="button" class="position-absolute  end-0 top-0 p-2 me-2"
+          ><i class="fas fa-search"></i
+        ></span>
       </div>
 
       <div class="d-flex">
@@ -38,7 +35,7 @@
           </select>
         </div>
         <div>
-          <select class="form-select" aria-label="selectFilterRegion">
+          <select class="form-select" aria-label="selectFilteruser_region">
             <option value=" ">Sort</option>
             <option>Sort</option>
           </select>
@@ -63,10 +60,10 @@
         </td>
         <td>{{ customer.phone_number }}</td>
         <td >
-          <span v-if="customer.joined_date">{{ customer.joined_date }}</span
+          <span v-if="customer.joined_date">{{ (new Date(customer.joined_date)).toString().split(' ').slice(0,4).join(' ')  }}</span
           ><span v-else>--/--</span>
         </td>
-        <td>{{ customer.region + " / " + customer.woreda }}</td>
+        <td>{{ customer.user_region + " / " + customer.user_woreda }}</td>
         <td>
           <span class="me-2" @click="showEditModal(customer)" role="button"
             ><i class="far fa-edit"></i
@@ -168,33 +165,33 @@
       </div>
 
       <div class="mb-1">
-        <label for="region" class="form-label">Region</label>
+        <label for="user_region" class="form-label">Region</label>
         <input
           type="text"
           class="form-control"
-          id="region"
-          v-model.trim="customer.region"
+          id="user_region"
+          v-model.trim="customer.user_region"
         />
       </div>
 
       <div class="mb-1">
-        <label for="zone" class="form-label">Zone</label>
+        <label for="user_zone" class="form-label">Zone</label>
         <input
           type="text"
           class="form-control"
-          id="zone"
-          v-model.trim="customer.zone"
-          @blur="v$.customer.zone.$touch"
+          id="user_zone"
+          v-model.trim="customer.user_zone"
+          @blur="v$.customer.user_zone.$touch"
         />
       </div>
 
       <div class="mb-1">
-        <label for="woreda" class="form-label">Woreda</label>
+        <label for="user_woreda" class="form-label">Woreda</label>
         <input
           type="text"
           class="form-control"
-          id="woreda"
-          v-model.trim="customer.woreda"
+          id="user_woreda"
+          v-model.trim="customer.user_woreda"
         />
       </div>
     </form>
@@ -211,7 +208,7 @@
   >
     <p>
       Do u want to delete? <br />
-      {{ customerForDelete?.title }}
+    <strong>{{ customerForDelete?.first_name+' '+ customerForDelete?.last_name}}</strong>  
     </p>
   </base-modal>
 
@@ -248,9 +245,9 @@ export default {
         last_name: "",
         phone_number: "",
         email: "",
-        region: "",
-        zone: "",
-        woreda: "",
+        user_region: "",
+        user_zone: "",
+        user_woreda: "",
       },
       // alert
       isAlertVisible: false,
@@ -275,9 +272,9 @@ export default {
         last_name: "",
         phone_number: "",
         email: "",
-        region: "",
-        zone: "",
-        woreda: "",
+        user_region: "",
+        user_zone: "",
+        user_woreda: "",
       }
     },
     showDeleteModal({ ...customer }) {
@@ -312,14 +309,14 @@ export default {
         this.isLoading = true;
         try {
           const response = await apiClient.put(
-            `/api/users/${this.customer.id}`,
+            `/api/users/${this.customer.customer_id}`,
             this.customer
           );
           if (response.status === 200) {
             const editedIndex = this.customers.findIndex((customer) => {
               return this.customer.id === customer.id;
             });
-            this.customers[editedIndex] = response.data;
+            this.customers[editedIndex] = this.customer;
             this.setAlertData(true, "Customer updated successfully");
             ///
           } else throw "";
@@ -360,17 +357,17 @@ export default {
       this.isLoading = true;
       try {
         const response = await apiClient.delete(
-          `/api/customers/${this.customerForDelete.id}`
+          `/api/users/${this.customerForDelete.customer_id}`
         );
         if (response.status === 200) {
           const deletedIndex = this.customers.findIndex((customer) => {
-            return customer.id === this.customerForDelete.id;
+            return customer.customer_id === this.customerForDelete.customer_id;
           });
           this.customers.splice(deletedIndex, 1);
         }
       } catch (e) {
         this.isAlertVisible = true;
-        this.alertMessage = "Faild to delete a new customer";
+        this.alertMessage = "Faild to delete a customer";
         this.dismissAlert();
       } finally {
         this.isLoading = false;

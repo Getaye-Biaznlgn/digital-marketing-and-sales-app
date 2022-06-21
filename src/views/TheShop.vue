@@ -8,6 +8,35 @@
       Add New Shop/Agent
     </button>
     <hr />
+    <div class="d-flex  p-2 selection-bar justify-content-between">
+      <div class="position-relative w-50 me-2">
+        <input
+          type="text"
+          v-model="searchValue"
+          class="form-control rounded-pill pe-5"
+          placeholder="Search by name"
+          aria-label="Recipient's username"
+          aria-describedby="basic-add"
+        />
+        <span role="button" class="position-absolute  end-0 top-0 p-2 me-2"
+          ><i class="fas fa-search"></i
+        ></span>
+      </div>
+      <div class="d-flex">
+        <div class="pe-2">
+          <select class="form-select" aria-label="selectFilte">
+            <option value=" ">Sort</option>
+            <option>Sort</option>
+          </select>
+        </div>
+        <div>
+          <select class="form-select" aria-label="selectFilterRegion">
+            <option value=" ">Sort</option>
+            <option>Sort</option>
+          </select>
+        </div>
+      </div>
+    </div>
     <!-- Table -->
     <table class="mt-2">
       <tr>

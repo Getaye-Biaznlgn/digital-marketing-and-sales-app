@@ -13,24 +13,20 @@
       Add New Product
     </button>
     <hr />
-    <div class="d-flex justify-content-between p-2 selection-bar">
-      <div class="d-flex rounded-pill">
+    <div class="d-flex  p-2 selection-bar justify-content-between">
+      <div class="position-relative w-50 me-2">
         <input
           type="text"
-          class="form-control search-input "
-          placeholder="Search"
-          aria-label="search"
-          aria-describedby="basic-addon2"
+          v-model="searchValue"
+          class="form-control rounded-pill pe-5"
+          placeholder="Search by name"
+          aria-label="Recipient's username"
+          aria-describedby="basic-add"
         />
-        <span
-          role="button"
-          class="input-group-text search rounded-0"
-          id="basic-addon2"
-        >
-          <i class="fas fa-search"></i>
-        </span>
+        <span role="button" class="position-absolute  end-0 top-0 p-2 me-2"
+          ><i class="fas fa-search"></i
+        ></span>
       </div>
-
       <div class="d-flex">
         <div class="pe-2">
           <select class="form-select" aria-label="selectFilte">
@@ -46,55 +42,57 @@
         </div>
       </div>
     </div>
-     <!-- Table -->
-  <table class="mt-2">
-    <tr>
-      <th>No</th>
-      <th>Model</th>
-      <th>Image</th>
-      <th>Name</th>
-      <th>Price</th>
-      <th>Stock</th>
-      <th>Weight</th>
-      <th>Category</th>
-      <th>Status</th>
-      <th><span class="sr-only">Action</span></th>
-    </tr>
-    <tr v-for="(product, index) in products" :key="product.id">
-      <td>{{ index + 1 }}</td>
-      <td style="white-space: nowrap;">{{ product.model }}</td>
-      <td>
-        <img
-          :src="product.images?.path"
-          width="100"
-          height="100"
-          alt="product image"
-        />
-      </td>
-      <td>{{ product.name }}</td>
-      <td>{{ product.price }}</td>
-      <td>{{ product.qty }}</td>
-      <td>{{ product.weight }}</td>
-      <td>{{ product.category?.title }}</td>
-      <td>{{ product.is_active ? "Active" : "In active" }}</td>
-      <td class="d-flex">
-        <span
-          class="me-2"
-          @click="
-            $router.push({ name: 'ProductDetail', params: { id: product.id } })
-          "
-          role="button"
-          ><i class="far fa-edit"></i
-        ></span>
-        <span @click="showDeleteModal(product)" role="button"
-          ><i class="fas fa-trash"></i
-        ></span>
-      </td>
-    </tr>
-  </table>
+    <!-- Table -->
+    <table class="mt-2">
+      <tr>
+        <th>No</th>
+        <th>Model</th>
+        <th>Image</th>
+        <th>Name</th>
+        <th>Price</th>
+        <th>Stock</th>
+        <th>Weight</th>
+        <th>Category</th>
+        <th>Status</th>
+        <th><span class="sr-only">Action</span></th>
+      </tr>
+      <tr v-for="(product, index) in filteredProduct" :key="product.id">
+        <td>{{ index + 1 }}</td>
+        <td style="white-space: nowrap">{{ product.model }}</td>
+        <td>
+          <img
+            :src="product.images?.path"
+            width="100"
+            height="100"
+            alt="product image"
+          />
+        </td>
+        <td>{{ product.name }}</td>
+        <td>{{ product.price }}</td>
+        <td>{{ product.qty }}</td>
+        <td>{{ product.weight }}</td>
+        <td>{{ product.category?.title }}</td>
+        <td>{{ product.is_active ? "Active" : "In active" }}</td>
+        <td class="d-flex">
+          <span
+            class="me-2"
+            @click="
+              $router.push({
+                name: 'ProductDetail',
+                params: { id: product.id },
+              })
+            "
+            role="button"
+            ><i class="far fa-edit"></i
+          ></span>
+          <span @click="showDeleteModal(product)" role="button"
+            ><i class="fas fa-trash"></i
+          ></span>
+        </td>
+      </tr>
+    </table>
   </div>
 
- 
   <!-- delete base modal -->
   <base-modal
     :modalState="isDeleteModalVisible"
@@ -120,18 +118,27 @@ import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import { ref, onBeforeUnmount, computed } from "vue";
 export default {
-  components: {
-  },
+  components: {},
   setup() {
     const store = useStore();
     const router = useRouter();
     var isDeleteModalVisible = ref(false);
-    const products= computed(()=>store.getters.products)
+    const products = computed(() => store.getters.products);
     var isLoading = ref(false);
     var productForDelete = ref();
     var isAlertVisible = ref(false);
     var timeout = ref(false);
-    
+    var searchValue = ref("");
+
+    var filteredProduct = computed(() => {
+      if (searchValue.value == "") {
+        return products.value;
+      }
+
+      return products.value.filter((product) =>
+        product.name.toLowerCase().includes(searchValue.value.toLowerCase())
+      );
+    });
     var showAddModal = function () {
       router.push({ name: "AddProduct" });
       // productForDelete.value= product
@@ -175,7 +182,7 @@ export default {
     onBeforeUnmount(function () {
       clearTimeout(timeout);
     });
-    store.dispatch('fetchProducts')
+    store.dispatch("fetchProducts");
     return {
       showAddModal,
       closeDeleteModal,
@@ -186,9 +193,9 @@ export default {
       productForDelete,
       products,
       isLoading,
+      searchValue,
+      filteredProduct,
     };
   },
 };
 </script>
-
-

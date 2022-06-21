@@ -1,7 +1,7 @@
 <template>
       <li>
         <router-link
-          class="nav-link py-2 ps-2 fw-bold"
+          class="nav-link py-2 ps-2 fw-bold" :class="{active: isSelected}"
           :to="{ name: routeName}"
           >{{label}}</router-link
         >
@@ -18,14 +18,12 @@
        routeName:{
         type: String,
         required: true
+       },
+       isSelected:{
+        default:false
        }
     },
-    setup(){
-        
-        
-    }
  }
-  
 </script>
 
 <style>

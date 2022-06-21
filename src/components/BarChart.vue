@@ -11,11 +11,11 @@ export default {
   props: {
     labels: {
       required: false,
-      default: ["Monday", "Tuesday", "Sunday"],
+      default: ["Monday", "Tuesday", "Sunday","Wednesday",'Friday','Saturday','Thursdary'],
     },
     data: {
       required: false,
-      default: [10000, 12090, 15090],
+      default: [10000, 12090, 15090,23444,23421,13312,12314],
     },
   },
   data() {

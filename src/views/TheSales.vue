@@ -6,22 +6,19 @@
     all sales with theier details.
   </div>
 <hr/>
-    <div class="d-flex justify-content-between p-2 selection-bar">
-      <div class="d-flex border rounded">
+    <div class="d-flex  p-2 selection-bar justify-content-between">
+      <div class="position-relative w-50 me-2">
         <input
           type="text"
-          class="form-control search-input"
-          placeholder="Search"
-          aria-label="search"
-          aria-describedby="basic-addon2"
+          v-model="searchValue"
+          class="form-control rounded-pill pe-5"
+          placeholder="Search by name"
+          aria-label="Recipient's username"
+          aria-describedby="basic-add"
         />
-        <span
-          role="button"
-          class="input-group-text search rounded-0"
-          id="basic-addon2"
-        >
-          <i class="fas fa-search"></i>
-        </span>
+        <span role="button" class="position-absolute  end-0 top-0 p-2 me-2"
+          ><i class="fas fa-search"></i
+        ></span>
       </div>
 
       <div class="d-flex">
