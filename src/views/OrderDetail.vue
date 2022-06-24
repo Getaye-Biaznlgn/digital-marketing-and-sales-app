@@ -1,12 +1,5 @@
 <template>
-  <div class="bg-light-grey p-2">
-    <span
-      @click="$router.back()"
-      role="button"
-      class="text-dark-blue pe-2 fw-bold fs-5"
-      ><i class="fas fa-arrow-left"></i
-    ></span>
-    <span class="fw-bold fs-5">Order Details</span>
+<DetailPage title="Order Details">
     <div class="container-fuild mt-2 px-4">
       <div class="row g-5">
         <div class="col-md-6">
@@ -103,7 +96,7 @@
         </tr>
       </table>
     </div>
-  </div>
+</DetailPage>
 </template>
 
 <script>

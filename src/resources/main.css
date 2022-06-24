@@ -45,3 +45,20 @@ input[type="checkbox"]:checked{
   background-color: #f1f1f1;
   min-height: 100vh;
 }
+
+.warining input,
+.warining textarea {
+  border: 1px red solid;
+}
+.warining span {
+  display: inline;
+  color: red;
+  font-size: 14px;
+}
+
+.brand-color1{
+  color: #ff7e00;
+ }
+ .brand-color2{
+  color: #457139;
+ }

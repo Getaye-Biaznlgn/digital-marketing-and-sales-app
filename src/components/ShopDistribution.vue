@@ -65,8 +65,10 @@
           <input
             min="1"
             type="text"
+            maxlength="4"
             size="4"
             class="p-0"
+            placeholder="Qty"
             @blur="setValue(product.id, $event)"
             name="qty"
             :id="'qty' +index "

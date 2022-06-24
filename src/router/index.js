@@ -1,7 +1,17 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import TheDashboard from "../views/TheDashboard"
+import AdminPort from "../views/AdminPort"
 const routes = [
   {
+    path: '/admin',
+    name: 'AdminPort',
+    component: AdminPort,
+    meta: {
+      authRequired: true,
+    },
+    children: [
+
+      {
     path: '/',
     name: 'TheDashboard',
     component: TheDashboard
@@ -42,9 +52,14 @@ const routes = [
     component: () => import(/* webpackChunkName: "setting" */ '../views/TheSetting.vue')
   },
   {
+    path: '/edit-product/:id',
+    name: 'UpdateProduct',
+    component: () => import(/* webpackChunkName: "update product" */ '../views/UpdateProduct.vue')
+  },
+  {
     path: '/product-detail/:id',
     name: 'ProductDetail',
-    component: () => import(/* webpackChunkName: "product-detail" */ '../views/ProductDetail.vue')
+    component: () => import(/* webpackChunkName: "product detail" */ '../views/ProductDetail.vue')
   },
   {
     path: '/supported-languages',
@@ -81,6 +96,36 @@ const routes = [
     name: 'TheAgent',
     component: () => import(/* webpackChunkName: "the-agent" */ '../views/TheAgent.vue')
   },
+  {
+    path: '/add-new-order',
+    name: 'AddNewOrder',
+    component: () => import(/* webpackChunkName: "add-new-order" */ '../views/AddNewOrder.vue')
+  },
+    ]
+  },
+  {
+    path: '/reset-password/:token',
+      props: true,
+        name: 'ResetPassword',
+          component: () => import(/* webpackChunkName: "login" */ '../views/ResetPassword.vue'), 
+    },
+  {
+    path: "/:notFound(.*)*", redirect: "/"
+  },
+  {
+    path: '/login',
+      name: 'TheLogin',
+        component: () => import(/* webpackChunkName: "login" */ '../views/TheLogin.vue'),
+          beforeEnter: (to, from, next) => {
+            if (localStorage.getItem('tokenA'))
+              return next('/')
+            else {
+              next()
+            }
+          },
+  
+    },
+  
 ]
 
 const router = createRouter({
@@ -89,4 +134,11 @@ const router = createRouter({
   linkActiveClass: "active",
 })
 
+router.beforeEach((to, from, next) => {
+  if (to.matched.some(record => record.meta.authRequired) && !localStorage.getItem('tokenA')) {
+    return next({ name: 'TheLogin' })
+  }
+  else
+    next()
+})
 export default router

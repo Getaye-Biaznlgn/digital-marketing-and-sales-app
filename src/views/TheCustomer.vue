@@ -202,7 +202,7 @@
     :modalState="isDeleteModalVisible"
     btnLabel="Delete"
     :isLoading="isLoading"
-    title="Delete Image"
+    title="Delete Customer"
     @close="closeDeleteModal"
     @submit="deleteCustomer"
   >
@@ -212,7 +212,7 @@
     </p>
   </base-modal>
 
-  <!--to show delete image is failed  -->
+  <!--  -->
   <the-alert
     :isVisible="isAlertVisible"
     :message="alertMessage"

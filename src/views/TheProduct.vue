@@ -74,11 +74,22 @@
         <td>{{ product.category?.title }}</td>
         <td>{{ product.is_active ? "Active" : "In active" }}</td>
         <td class="d-flex">
-          <span
+           <span
             class="me-2"
             @click="
               $router.push({
                 name: 'ProductDetail',
+                params: { id: product.id },
+              })
+            "
+            role="button"
+            ><i class="far fa-eye"></i
+          ></span>
+          <span
+            class="me-2"
+            @click="
+              $router.push({
+                name: 'UpdateProduct',
                 params: { id: product.id },
               })
             "

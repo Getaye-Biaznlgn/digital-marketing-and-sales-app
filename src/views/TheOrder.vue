@@ -4,12 +4,12 @@
     <div>
       In the order section, you will review and manage all solar product orders.
     </div>
-    <button
-      @click="showAddModal"
+    <!-- <button
+      @click="AddOrderPage"
       class="btn ms-auto d-flex justify-self-end btn-bg-primary text-light"
     >
       Add New Order
-    </button>
+    </button> -->
     <hr />
     <div class="d-flex p-2 selection-bar justify-content-between">
       <div class="position-relative w-50 me-2">
@@ -198,8 +198,9 @@ export default {
       this.resetFieldEmpity();
       this.isAddModalVisible = false;
     },
-    showAddModal() {
-      this.isAddModalVisible = true;
+    AddOrderPage() {
+      // this.isAddModalVisible = true;
+      this.$router.push({name:'AddNewOrder'})
     },
     // async updateOrder() {
     //   this.v$.$validate();

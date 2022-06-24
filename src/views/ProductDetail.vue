@@ -1,132 +1,85 @@
 <template>
-<div class="bg-light-grey p-2">
- <span
-       @click="$router.back()"
-       role="button"
-       class="text-dark-blue pe-2 fw-bold fs-5"
-       ><i class="fas fa-arrow-left"></i>Back</span
-     >
-<ProductUpdateForm  :productInfo="{...product}"/>
-<ProductImagePreview :productInfo="{...product}"/>
-  <!-- add new Image -->
-  <base-card>
-    <div class="fs-5 mb-2 fw-bold">Add More Images</div>
-<multiple-image-upload @saveImage="setNewImages" />
-<transition>
-    <div v-if="newImages.length" class="progress mt-3">
-      <div
-        class="progress-bar btn-add"
-        role="progressbar"
-        :style="{ width: uploadPercentage + '%' }"
-        id="progress"
-        :aria-valuenow="p"
-        aria-valuemin="0"
-        aria-valuemax="100"
-      ></div>
+  <DetailPage title="Product Detail">
+    <div class="container-fluid overflow-hidden mt-2">
+      <div class="row g-3">
+        <div class="col-lg-6">
+          <div class="bg-white p-3 rounded">
+            <div><span class="fw-bold me-2">Name:</span>{{ product.name }}</div>
+            <div>
+              <span class="fw-bold me-2">Brand:</span>{{ product.brand }}
+            </div>
+            <div>
+              <span class="fw-bold me-2">Price:</span
+              >{{ "ETB " + product.price }}
+            </div>
+            <div><span class="fw-bold me-2">Qty:</span>{{ product.qty }}</div>
+            <div>
+              <span class="fw-bold me-2">Maximum Current Power:</span
+              >{{ product.maximum_current_power }}
+            </div>
+            <div>
+              <span class="fw-bold me-2">Maximum Supply Voltage:</span
+              >{{ product.maximum_supply_voltage }}
+            </div>
+            <div>
+              <div class="my-3">
+                <img
+                  :src="selectedImg"
+                  v-if="selectedImg"
+                  width="300"
+                  height="300"
+                  alt="img"
+                  class="d-block mx-auto"
+                />
+                <div
+                  v-else
+                  style="width: 300px; height: 300px; background-color: #f1f1f1;"
+                  class="d-block mx-auto"
+                ></div>
+              </div>
+
+              <div class="">
+                <img
+                  class="mx-2"
+                  role="button"
+                  width="50"
+                  @mouseenter="setPreview(img.path)"
+                  height="50"
+                  v-for="img in product.images"
+                  :key="img.id"
+                  :src="img.path"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="bg-white p-3 rounded">
+            <div><span class="fw-bold me-2">Description:</span>{{ product.description }}</div>
+            <div class=" mt-2"><span class="fw-bold me-2">Product Detail:</span><span v-html="product.detail"></span></div>
+          </div>
+        </div>
+      </div>
     </div>
-</transition>   
-  <base-button
-      class="mt-3"
-      title="Upload images"
-      :isLoading="isImageUploading"
-      @submit="uploadNewImages"
-    />
-  </base-card>  
-  </div>
- <!-- alert  -->
-  <the-alert
-    :isVisible="isAlertVisible"
-    :message="alertMessage"
-    :isSucceed="isRequestSucceed"
-  />
+  </DetailPage>
 </template>
 
 <script>
 import apiClient from "../resources/baseUrl";
-import ProductUpdateForm from "../components/ProductUpdateForm.vue"
-import ProductImagePreview from '../components/ProductImagePreview.vue'
-import MultipleImageUpload from '../components/MultipleImageUpload.vue'
-export default{
-    components:{
-        ProductUpdateForm,
-        ProductImagePreview,
-        MultipleImageUpload
-    },
-   data(){
-    return{
-       product:'',
-       newImages:[],
-       uploadPercentage:'',
-       isImageUploading:false,
-       timeout:'',
-      // alert
-      isAlertVisible:false,
-      alertMessage:'',
-      isRequestSucceed:''
-    }
-   },
-   methods:{
-    setNewImages(img){
-       this.newImages=img
-    },
-  
-     dismissAlert() {
-      this.timeout = setTimeout(() => {
-        this.isAlertVisible = false;
-      }, 2000);},
 
-   async uploadNewImages(){
-       this.isImageUploading = true;
-      var fd = new FormData();
-      this.newImages.forEach((image, i) => {
-        fd.append(`images[${i}]`, image);
-      });
-      fd.append("product_id", this.product.id);
-      try {
-        const response = await apiClient.post("/api/images", fd, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Accept: "application/json",
-          },
-           onUploadProgress: function (progressEvent) {
-              this.uploadPercentage = parseInt(
-                Math.round((progressEvent.loaded / progressEvent.total) * 100)
-              );
-            }.bind(this),
-        });
-        if (response.status === 200) {
-          this.product.images.push(...response.data);
-          this.isAlertVisible = true;
-          this.alertMessage = "Images has been uploaded successfully!";
-          this.isRequestSucceed = true;
-          this.newImages = [];
-        } else throw "";
-      } catch (e) {
-        this.isAlertVisible = true;
-        this.alertMessage = "Failed to upload images";
-        this.isRequestSucceed = false;
-      } finally {
-        this.isImageUploading = false;
-        this.dismissAlert();
-      }
+export default {
+  data() {
+    return {
+      product: "",
+      selectedImg: null,
+    };
+  },
+  methods: {
+    setPreview(img) {
+      this.selectedImg = img;
     },
-// product_translations
-    // async fetchProductBasedOnLanguage(){
-    //    try {
-    //     this.$store.commit("setIsLoading", true);
-    //     const response = await apiClient.get(
-    //       `/api/product_translations/${this.$route.params.id}?language=${this.selectedLanguage}`
-    //     );
-    //     if (response.status === 200) {
-    //       this.product = response.data.data;
-    //     }
-    //   } catch (e) {
-    //     //
-    //   } finally {
-    //     this.$store.commit("setIsLoading", false);
-    //   }
-    // },
-    async fetchProduct () {
+    async productDetail() {
+      // alert(query)
       try {
         this.$store.commit("setIsLoading", true);
         const response = await apiClient.get(
@@ -134,45 +87,19 @@ export default{
         );
         if (response.status === 200) {
           this.product = response.data.data;
+          this.selectedImg = this.product?.images?.[0]?.path;
         }
       } catch (e) {
         //
       } finally {
         this.$store.commit("setIsLoading", false);
       }
-   },
- 
- },
-   created(){
-    this.fetchProduct()
-   },
-   beforeUnmount(){
-    clearTimeout(this.timeout)
-   }
-}
-
-
+    },
+  },
+  created() {
+    this.productDetail();
+  },
+};
 </script>
 
-<style>
-
-.v-enter-from {
-  opacity: 0;
-}
-.v-enter-active {
-  transition: all 0.3s ease-out;
-}
-.v-enter-to {
-  opacity: 1;
-}
-.v-leave-from {
-  opacity: 1;
-}
-.v-leave-active {
-  transition: all 3s ease-in;
-}
-.v-leave-to {
-  opacity: 0;
-}
-
-</style>
+<style></style>

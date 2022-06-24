@@ -1,5 +1,6 @@
 import { createStore } from 'vuex'
 import apiClient from '@/resources/baseUrl';
+import auth from './auth'
 export default createStore({
   state: {
     isLoading:false,
@@ -60,5 +61,6 @@ export default createStore({
     },
   },
   modules: {
+    auth
   }
 });

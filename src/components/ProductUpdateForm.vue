@@ -13,7 +13,6 @@
       </select>
     </div>
   </div>
-  <div class="fs-5 mb-2 ms-2 fw-bold">Product Info</div>
   <!-- translated products info -->
   <div v-if="selectedLanguage.toLowerCase() != 'en'" class="mx-auto">
     <form @submit.prevent class="row">
@@ -50,7 +49,7 @@
         </div>
       </base-card>
       <base-card class="mt-2 col-md-6">
-         <div>
+        <div>
           <!-- {{product.detail}} -->
           <label for="textEditor">Product Detail</label>
           <text-editor
@@ -302,8 +301,8 @@ export default {
     setEditorValue(value) {
       this.product.detail = value;
     },
-    setEditorValueForTranslated(value){
-      this.translatedProductInfo.detail= value;
+    setEditorValueForTranslated(value) {
+      this.translatedProductInfo.detail = value;
     },
     dismissAlert() {
       this.timeout = setTimeout(() => {
@@ -319,7 +318,9 @@ export default {
       this.isLoading = true;
       try {
         const response = await apiClient.put(
-          `/api/products/${this.product.id}}?language=${this.selectedLanguage.toLowerCase()}`,
+          `/api/products/${
+            this.product.id
+          }}?language=${this.selectedLanguage.toLowerCase()}`,
           {
             language: this.selectedLanguage.toLowerCase(),
             ...this.productInfo,
@@ -342,7 +343,7 @@ export default {
       if (this.selectedLanguage.toLowerCase() == "en") {
         return;
       }
-     
+
       try {
         this.$store.commit("setIsLoading", true);
         const response = await apiClient.get(
@@ -351,15 +352,15 @@ export default {
           }?language=${this.selectedLanguage.toLowerCase()}`
         );
         if (response.status === 200) {
-          if(response.data && response.data.data)
-          this.translatedProductInfo = response.data.data;
-          else  
-             this.translatedProductInfo={
-        name:"",
-        warranty:'',
-        description:'',
-        detail:''
-      }
+          if (response.data && response.data.data)
+            this.translatedProductInfo = response.data.data;
+          else
+            this.translatedProductInfo = {
+              name: "",
+              warranty: "",
+              description: "",
+              detail: "",
+            };
         }
       } catch (e) {
         //
@@ -371,14 +372,13 @@ export default {
     },
 
     async updateProductTransInfo() {
-      this.isLoading = true; 
+      this.isLoading = true;
       try {
         const response = await apiClient.put(
           `/api/product_translations/${this.product.id}}`,
           {
             language: this.selectedLanguage.toLowerCase(),
             ...this.translatedProductInfo,
-
           }
         );
         if (response.status === 200) {

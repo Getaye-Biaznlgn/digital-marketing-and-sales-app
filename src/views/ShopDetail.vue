@@ -1,4 +1,6 @@
 <template>
+
+
   <div class="">
     <div class="d-flex">
        <span
@@ -6,28 +8,28 @@
       role="button"
       class="text-dark-blue p-1 fw-bold fs-5"
       ><i class="fas fa-arrow-left"></i></span
-    > <h5 class="mt-1">Shop Detail</h5> 
+    > <span class="mt-1 fs-5 fw-bold">Shop Detail</span> 
     </div>
    
     <div class="mx-3">
       <div class="d-flex justify-content-between">
         <div>
           <p class="text-capitalize mb-1">
-            <strong class="me-1"> Shop name:</strong>{{ shop.shop_name }}
+            <strong class="me-1"> Shop name:</strong>{{ shop?.shop_name }}
           </p>
           <p class="text-capitalize mb-1">
             <strong class="me-1"> Shop status:</strong
-            >{{ shop.shop_status ? "Active" : "Inactive" }}
+            >{{ shop?.shop_status ? "Active" : "Inactive" }}
           </p>
         </div>
         <div>
           <p class="text-capitalize mb-1">
             <strong class="me-1"> Shop location:</strong
-            >{{ shop.region + "/" + shop.city }}
+            >{{ shop?.region + "/" + shop.city }}
           </p>
           <p class="text-capitalize mb-1">
             <strong class="me-1"> Shop manager:</strong
-            >{{ shop.manager_first_name + " " + shop.manager_last_name }}
+            >{{ shop?.manager_first_name + " " + shop?.manager_last_name }}
           </p>
         </div>
       </div>
