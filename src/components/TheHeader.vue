@@ -1,9 +1,9 @@
 <template>
-  <nav class="d-flex shadow-sm justify-content-between py-2 px-3 bg-blue-black">
+  <nav class="d-flex shadow-sm justify-content-between py-2 px-2 bg-blue-black">
     <div>
-      <strong class="fw-bold text-light"
-        ><span class="brand-color1">RENSYS </span>
-        <span class="brand-color2">ENGINEERING</span></strong
+      <strong class="fw-bold fs-5  text-light"
+        ><span class="brand-color1 align-middle">RENSYS </span>
+        <span class="brand-color2 align-middle">ENGINEERING</span></strong
       >
     </div>
     <div class="dropdown text-light">

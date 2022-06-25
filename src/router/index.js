@@ -101,6 +101,16 @@ const routes = [
     name: 'AddNewOrder',
     component: () => import(/* webpackChunkName: "add-new-order" */ '../views/AddNewOrder.vue')
   },
+  {
+    path: '/role',
+    name: 'TheRole',
+    component: () => import(/* webpackChunkName: "the-role" */ '../views/TheRole.vue')
+  },
+  {
+    path: '/permission',
+    name: 'ThePermission',
+    component: () => import(/* webpackChunkName: "the-permission" */ '../views/ThePermission.vue')
+  },
     ]
   },
   {

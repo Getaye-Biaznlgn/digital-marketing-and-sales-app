@@ -1,13 +1,6 @@
 <template>
-  <div class="bg-light-grey p-2">
-     <span
-       @click="$router.back()"
-       role="button"
-       class="text-dark-blue pe-2 fw-bold fs-5"
-       ><i class="fas fa-arrow-left"></i>Back</span
-     >
-    <h5 class="my-2 ms-2">Add Product</h5>
-    <form @submit.prevent>
+ <DetailPage title="Add Product">
+   <form @submit.prevent>
       <div class="row">
         <base-card class="mt-2 col-lg-5">
           <div class="mb-3" :class="{ warining: v$.product.name.$error }">
@@ -192,6 +185,7 @@
           </div>
         </base-card>
         <base-card class="col-lg-5 mx-6">
+      
           <div class="mb-3" :class="{ warining: v$.product.brand.$error }">
             <label for="brand" class="form-label">Brand</label>
             <input
@@ -209,22 +203,30 @@
               {{ error.$message + ", " }}</span
             >
           </div>
-          <div class="mb-3" :class="{ warining: v$.product.weight.$error }">
-            <label for="weight" class="form-label">Weight</label>
+
+         <!-- <div class=" mb-3">
+           <input type="text" class="form-control" placeholder="Recipient's username" aria-label="Recipient's username" aria-describedby="basic-addon2">
+           <span class="input-group-text" id="basic-addon2">Kg</span>
+         </div> -->
+         <div class="mb-3" :class="{ warining: v$.product.weight.$error }">
+         <label for="weight" class="form-label">Weight</label> <br/>
+         <div class="input-group" >
             <input
-              type="text"
+              type="number"
               class="form-control"
               id="weight"
               v-model.trim="product.weight"
               @blur="v$.product.weight.$touch"
             />
-            <span
+            <span class="input-group-text" id="weight-text">Kg</span>
+          </div>
+          <span
               class="error-msg mt-1"
               v-for="(error, index) of v$.product.weight.$errors"
               :key="index"
               >{{ error.$message + ", " }}</span
             >
-          </div>
+            </div>
           <div
             class="mb-3"
             :class="{ warining: v$.product.maximum_supply_voltage.$error }"
@@ -232,13 +234,17 @@
             <label for="maximum_supply_voltage" class="form-label"
               >Maximum supply voltage</label
             >
-            <input
+            <div class="input-group">
+              <input
               type="text"
               class="form-control"
               id="maximum_supply_voltage"
               v-model.trim="product.maximum_supply_voltage"
               @blur="v$.product.maximum_supply_voltage.$touch"
             />
+            <span class="input-group-text" id="max-volt-text">V</span>
+            </div>
+            
             <span
               class="error-msg mt-1"
               v-for="(error, index) of v$.product.maximum_supply_voltage
@@ -254,13 +260,17 @@
             <label for="maximum_current_power" class="form-label"
               >Maximum current power</label
             >
-            <input
-              type="text"
-              class="form-control"
-              id="maximum_current_power"
-              v-model.trim="product.maximum_current_power"
-              @blur="v$.product.maximum_current_power.$touch"
-            />
+            <div class="input-group">
+              <input
+                type="text"
+                class="form-control"
+                id="maximum_current_power"
+                v-model.trim="product.maximum_current_power"
+                @blur="v$.product.maximum_current_power.$touch"
+              />
+              <span class="input-group-text" id="max-volt-text">W</span>
+            </div>
+           
             <span
               class="error-msg mt-1"
               v-for="(error, index) of v$.product.maximum_current_power.$errors"
@@ -283,7 +293,7 @@
       />
     </form>
 
-  </div>
+  </DetailPage>
 </template>
 
 <script>
@@ -313,7 +323,7 @@ export default {
         maximum_current_power: "",
         price: "",
         qty: "",
-        weight: "",
+        weight: '',
         date_of_production: "",
         category_id: "",
         detail: "",
@@ -324,6 +334,8 @@ export default {
         detail: "",
         product_id: "",
       },
+      timeout:'',
+
       //alert
       isAlertVisible: "",
       alertMessage: "",
@@ -334,6 +346,11 @@ export default {
     ...mapGetters(["categories"]),
   },
   methods: {
+     dismissAlert() {
+     this.timeout = setTimeout(() => {
+       this.isAlertVisible = false;
+      }, 2000);
+    },
     setAlertData(isRequestSucceed, message) {
       this.isAlertVisible = true;
       this.alertMessage = message;
@@ -372,9 +389,13 @@ export default {
            this.setAlertData(false, 'Faild to upload product')
         } finally {
           this.isLoading = false;
+          this.dismissAlert()
         }
       }
     },
+  },
+  beforeUnmount(){
+     clearTimeout(this.timeout)
   },
   validations() {
     return {
@@ -382,8 +403,8 @@ export default {
         name: {
           required,
           max: helpers.withMessage(
-            "Name should not be greater than 50 characters",
-            maxLength(50)
+            "The name is too large",
+            maxLength(300)
           ),
         },
         description: {
@@ -410,9 +431,11 @@ export default {
           max: maxLength(200),
         },
         maximum_supply_voltage: {
+          required,
           numeric,
         },
         maximum_current_power: {
+          required,
           numeric,
         },
         price: {

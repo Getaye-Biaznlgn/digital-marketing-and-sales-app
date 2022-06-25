@@ -3,30 +3,30 @@ import apiClient from '@/resources/baseUrl';
 import auth from './auth'
 export default createStore({
   state: {
-    isLoading:false,
-    categories:[],
-    products:[]
+    isLoading: false,
+    categories: [],
+    products: []
   },
   getters: {
-    isLoading(state){
+    isLoading(state) {
       return state.isLoading
     },
-    categories(state){
+    categories(state) {
       return state.categories
     },
-    products(state){
+    products(state) {
       return state.products
     }
   },
   mutations: {
-    setIsLoading(state, payload){
-      state.isLoading= payload
+    setIsLoading(state, payload) {
+      state.isLoading = payload
     },
-    setCategories(state, payload){
-      state.categories= payload
+    setCategories(state, payload) {
+      state.categories = payload
     },
-    setProducts(state, payload){
-      state.products= payload
+    setProducts(state, payload) {
+      state.products = payload
     }
   },
   actions: {
@@ -59,6 +59,24 @@ export default createStore({
         context.commit("setIsLoading", false);
       }
     },
+    async deleteProducts(context, id) {
+      
+        const response = await apiClient.delete(
+          `/api/products/${id}`
+        );
+
+        if (response.status === 200) {
+          var previousData = context.getters.products;
+          const deletedIndex = previousData.findIndex((product) => {
+            return product.id === id;
+          });
+          previousData.splice(deletedIndex, 1)
+          context.commit('setProducts', previousData);
+        } else{
+          throw 'faild to delete'
+        }
+     
+    }
   },
   modules: {
     auth

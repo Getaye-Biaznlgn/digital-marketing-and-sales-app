@@ -3,7 +3,7 @@
         <router-link
           class="nav-link py-2 ps-2 fw-bold" :class="{active: isSelected}"
           :to="{ name: routeName}"
-          >{{label}}</router-link
+          ><span class="me-2"><slot/></span>{{label}}</router-link
         >
       </li>
 </template>

@@ -54,7 +54,7 @@
       </tr>
       <tr v-for="(order, index) in orders" :key="order.id">
         <td>{{ index + 1 }}</td>
-        <td>{{ order.pin }}</td>
+        <td>{{ order.order_ref }}</td>
         <td>{{ order.first_name + " " + order.last_name }}</td>
         <td>{{ (new Date(order.order_date)).toString().split(' ').slice(0,4).join(' ')  }}</td>
         <td>{{ order.shop_name }}</td>

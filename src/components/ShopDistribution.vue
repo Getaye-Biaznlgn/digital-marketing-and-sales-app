@@ -185,7 +185,6 @@ export default {
         );
         if (response.status === 200) {
           this.$emit("newProductAdded", response.data.data);
-          alert("succuss, thank you for choose us");
         } else throw "";
       } catch (e) {
         this.isAlertVisible = true;

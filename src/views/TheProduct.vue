@@ -1,6 +1,6 @@
 <template>
   <div class="m-3">
-    <h5>Product Details</h5>
+    <h5>Products</h5>
     <div>
       In the product section, you will review and manage all products with their
       details. You can view and edit many information such as product name,
@@ -124,7 +124,7 @@
 </template>
 
 <script>
-import apiClient from "../resources/baseUrl";
+// import apiClient from "../resources/baseUrl";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import { ref, onBeforeUnmount, computed } from "vue";
@@ -166,16 +166,12 @@ export default {
     const deleteProduct = async function () {
       isLoading.value = true;
       try {
-        const response = await apiClient.delete(
-          `/api/products/${productForDelete.value.id}`
-        );
-        if (response.status === 200) {
-          const deletedIndex = this.products.findIndex((product) => {
-            return product.id === this.productForDelete.id;
-          });
-          this.products.splice(deletedIndex, 1);
-          this.closeDeleteModal();
-        }
+        // const response = await apiClient.delete(
+        //   `/api/products/${productForDelete.value.id}`
+        // );
+        store.dispatch('deleteProducts', productForDelete.value.id)
+          closeDeleteModal();
+        
       } catch (e) {
         isAlertVisible.value = true;
       } finally {
