@@ -277,7 +277,7 @@ export default {
     async fetchOrders() {
       try {
         this.$store.commit("setIsLoading", true);
-        const response = await apiClient.get(`/api/orders`);
+        const response = await apiClient.get(`/api/all_orders`);
         if (response.status === 200) {
           this.orders = response.data.data;
         }
