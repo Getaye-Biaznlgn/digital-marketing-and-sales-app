@@ -59,7 +59,7 @@
         <td>{{ (new Date(order.order_date)).toString().split(' ').slice(0,4).join(' ')  }}</td>
         <td>{{ order.shop_name }}</td>
         <td>{{ order.order_status }}</td>
-        <td>--\\--</td>
+        <td>{{order.payment_type}}</td>
         <td>
           <span class="me-2" @click="showDetail(order.id)" role="button"
             ><i class="far fa-eye"></i

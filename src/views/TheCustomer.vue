@@ -63,7 +63,7 @@
           <span v-if="customer.joined_date">{{ (new Date(customer.joined_date)).toString().split(' ').slice(0,4).join(' ')  }}</span
           ><span v-else>--/--</span>
         </td>
-        <td>{{ customer.user_region + " / " + customer.user_woreda }}</td>
+        <td>{{ customer.user_region??''}}-{{customer.user_woreda??''}}</td>
         <td>
           <span class="me-2" @click="showEditModal(customer)" role="button"
             ><i class="far fa-edit"></i
