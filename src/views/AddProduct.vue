@@ -67,13 +67,18 @@
           </div>
           <div class="mb-3" :class="{ warining: v$.product.price.$error }">
             <label for="price" class="form-label">Price</label>
-            <input
+            <div class="input-group">
+              <input
               type="text"
               class="form-control"
               id="price"
               v-model.trim="product.price"
               @blur="v$.product.price.$touch"
             />
+            <span class="input-group-text" id="weight-text">ETB</span>
+
+            </div>
+            
             <span
               class="error-msg mt-1"
               v-for="(error, index) of v$.product.price.$errors"

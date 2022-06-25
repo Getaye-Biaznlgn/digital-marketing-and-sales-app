@@ -114,7 +114,7 @@
             >{{ error.$message + ", " }}</span
           >
         </div>
- <div class="mb-3" :class="{ warining: v$.product.model.$error }">
+          <div class="mb-3" :class="{ warining: v$.product.model.$error }">
           <label for="model" class="form-label">Model</label>
           <input
             type="text"
