@@ -114,7 +114,23 @@
             >{{ error.$message + ", " }}</span
           >
         </div>
-
+ <div class="mb-3" :class="{ warining: v$.product.model.$error }">
+          <label for="model" class="form-label">Model</label>
+          <input
+            type="text"
+            class="form-control"
+            id="model"
+            :disabled="selectedLanguage.toLowerCase() != 'en'"
+            v-model.trim="product.model"
+            @blur="v$.product.model.$touch"
+          />
+          <span
+            class="error-msg mt-1"
+            v-for="(error, index) of v$.product.model.$errors"
+            :key="index"
+            >{{ error.$message + ", " }}</span
+          >
+        </div>
         <div class="mb-3" :class="{ warining: v$.product.brand.$error }">
           <label for="brand" class="form-label">Brand</label>
           <input
