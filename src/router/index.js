@@ -126,13 +126,13 @@ const routes = [
     path: '/login',
       name: 'TheLogin',
         component: () => import(/* webpackChunkName: "login" */ '../views/TheLogin.vue'),
-          beforeEnter: (to, from, next) => {
-            if (localStorage.getItem('tokenA'))
-              return next('/')
-            else {
-              next()
-            }
-          },
+          // beforeEnter: (to, from, next) => {
+          //   if (localStorage.getItem('tokenA'))
+          //     return next('/')
+          //   else {
+          //     next()
+          //   }
+          // },
   
     },
   

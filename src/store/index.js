@@ -60,7 +60,6 @@ export default createStore({
       }
     },
     async deleteProducts(context, id) {
-      
         const response = await apiClient.delete(
           `/api/products/${id}`
         );

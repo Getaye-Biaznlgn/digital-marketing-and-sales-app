@@ -114,7 +114,7 @@
             >{{ error.$message + ", " }}</span
           >
         </div>
-          <div class="mb-3" :class="{ warining: v$.product.model.$error }">
+        <div class="mb-3" :class="{ warining: v$.product.model.$error }">
           <label for="model" class="form-label">Model</label>
           <input
             type="text"
@@ -277,6 +277,33 @@
 
     <!-- alert  -->
   </div>
+  <BaseCard>
+    <div class="fs-5 mb-2 fw-bold">Product State</div>
+    <div class="form-check">
+      <input
+        class="form-check-input"
+        type="checkbox"
+        v-model="isActive"
+        @change="setIsActive($event)"
+        value=""
+        id="flexCheckIsActive"
+      />
+      <label class="form-check-label" for="flexCheckDefault"> Is Active </label>
+    </div>
+    <div class="form-check">
+      <input
+        class="form-check-input"
+        type="checkbox"
+        v-model="isFeatured"
+        @change="setIsFeatured($event)"
+        value=""
+        id="flexCheckIsFeatured"
+      />
+      <label class="form-check-label" for="flexCheckDefault">
+        Is Featured
+      </label>
+    </div>
+  </BaseCard>
   <the-alert
     :isVisible="isAlertVisible"
     :message="alertMessage"
@@ -303,6 +330,9 @@ export default {
       languages: [],
       selectedLanguage: "en",
       translatedProductInfo: {},
+      //product state
+      isActive:"",
+      isFeatured:"",
       //   alert
       isAlertVisible: false,
       alertMessage: "",
@@ -314,6 +344,65 @@ export default {
     ...mapGetters(["categories"]),
   },
   methods: {
+   async setIsActive(){
+            try {
+        this.$store.commit("setIsLoading", true);
+        const response = await apiClient.post(
+          `/api/set_product_active/${
+            this.product.id
+          }`,
+          {
+            is_active:this.isActive? 1:0,
+            product_id:this.product.id
+          }
+        );
+        if (response.status === 200) {
+          this.isActive = response.data===1? true : false;
+           this.setAlertData(
+            true,
+            "Product state has been changed successfully"
+          );
+        }
+      } catch (e) {
+           this.setAlertData(
+            false,
+            "Faild to change product state"
+          );
+      } finally {
+        this.$store.commit("setIsLoading", false);
+        this.dismissAlert();
+      }
+    },
+  async setIsFeatured(){
+            try {
+        this.$store.commit("setIsLoading", true);
+        const response = await apiClient.post(
+          `/api/set_featured_products/${
+            this.product.id
+          }`,
+          {
+            is_featured :this.isFeatured? 1:0,
+            product_id:this.product.id
+
+          }
+        );
+        if (response.status === 200) {
+          this.isFeatured = response.data===1? true : false;
+           this.setAlertData(
+            true,
+            "Product featured state has been changed successfully!"
+          );
+        }
+      } catch (e) {
+           this.setAlertData(
+            false,
+            "Faild to change product featured state!"
+          );
+      } finally {
+        this.$store.commit("setIsLoading", false);
+        this.dismissAlert();
+      }
+    },
     setEditorValue(value) {
       this.product.detail = value;
     },
@@ -423,17 +512,23 @@ export default {
         this.$store.commit("setIsLoading", false);
       }
     },
+    init(){
+      this.product = { ...this.productInfo };
+     this.isActive=this.product?.is_active==1? true : false
+    this.isFeatured=this.product?.is_featured==1? true : false
+    }
   },
   beforeUnmount() {
     clearTimeout(this.timeout);
   },
   created() {
-    this.product = { ...this.productInfo };
+    this.init()
     this.fetchLanguages();
+    
   },
   watch: {
     productInfo() {
-      this.product = this.productInfo;
+     this.init()
     },
   },
   validations() {

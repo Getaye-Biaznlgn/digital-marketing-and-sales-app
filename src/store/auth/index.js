@@ -1,3 +1,4 @@
+import apiClient from "@/resources/baseUrl";
 export default {
     state: {
       isAuthenticated: false,
@@ -26,6 +27,21 @@ export default {
         state.user = payload;
       },
     },
-    actions: {},
+    actions: {
+      async user(context) {
+        context.commit("setIsLoading", true);
+        context.isLoading = true;
+        try {
+          var response = await apiClient.get("/api/user");
+          if (response.status === 200) {
+            context.commit("setUser", response.data);
+          } else {
+            throw "faild to load user";
+          }
+        } finally {
+          context.commit("setIsLoading", false);
+        }
+      },
+    },
   };
   
