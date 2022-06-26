@@ -6,12 +6,42 @@
       details. You can view and edit many information such as product name,
       description, stock, price and more.
     </div>
-    <button
+    <div class="d-flex justify-content-between">
+       <ul class="nav mt-4">
+  <li class="nav-item-tab">
+  <a  class="nav-link text-black " :class="{'border-bottom border-dark border-2' :filterString=='all'}" role="button" @click="fetchProducts('all')">
+        All Products
+   </a>  </li>
+  <li class="nav-item " >
+  <a  class="nav-link text-black" role="button" :class="{'border-bottom border-dark border-2' :filterString=='outstock'}" @click="fetchProducts('outstock')">
+        Out Stock
+   </a>  </li>
+  <li class="nav-item">
+   <a  class="nav-link text-black" role="button" :class="{'border-bottom border-dark border-2' :filterString=='instock'}" @click="fetchProducts('instock')">
+        In stock
+   </a>  
+   </li>
+
+    <li class="nav-item">
+   <a  class="nav-link text-black" role="button" :class="{'border-bottom border-dark border-2' :filterString=='active'}"  @click="fetchProducts('active')">
+        Active
+   </a>  
+   </li>
+
+    <li class="nav-item">
+   <a  class="nav-link text-black " role="button" :class="{'border-bottom border-dark border-2' :filterString=='inactive'}"  @click="fetchProducts('inactive')">
+        In Active
+   </a>  
+   </li>
+</ul>
+      <button
       @click="showAddModal"
-      class="btn ms-auto d-flex justify-self-end btn-bg-primary text-light"
+      class="btn btn-bg-primary text-light"
     >
       Add New Product
     </button>
+    </div>
+    
     <hr />
     <div class="d-flex  p-2 selection-bar justify-content-between">
       <div class="position-relative w-50 me-2">
@@ -124,7 +154,7 @@
 </template>
 
 <script>
-// import apiClient from "../resources/baseUrl";
+import apiClient from "../resources/baseUrl";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import { ref, onBeforeUnmount, computed } from "vue";
@@ -134,22 +164,41 @@ export default {
     const store = useStore();
     const router = useRouter();
     var isDeleteModalVisible = ref(false);
-    const products = computed(() => store.getters.products);
+    var products = ref([])
+    // const products = computed(() => store.getters.products);
     var isLoading = ref(false);
     var productForDelete = ref();
     var isAlertVisible = ref(false);
     var timeout = ref(false);
     var searchValue = ref("");
+    var filterString =ref('all')
 
     var filteredProduct = computed(() => {
       if (searchValue.value == "") {
         return products.value;
       }
-
       return products.value.filter((product) =>
         product.name.toLowerCase().includes(searchValue.value.toLowerCase())
       );
     });
+
+    const fetchProducts= async function(query){
+      //  store.dispatch(fetchProducts,query)
+       try {
+        store.commit("setIsLoading", true);
+        const response = await apiClient.get(`/api/products?filter=${query}`);
+        if (response.status === 200) {
+          products.value = response.data.data;
+          console.log('response', response.data.data)
+          filterString.value=query
+        }
+      } catch (e) {
+        //
+      } finally {
+        store.commit("setIsLoading", false);
+      }
+       
+    }
     var showAddModal = function () {
       router.push({ name: "AddProduct" });
       // productForDelete.value= product
@@ -189,19 +238,23 @@ export default {
     onBeforeUnmount(function () {
       clearTimeout(timeout);
     });
-    store.dispatch("fetchProducts");
+    // store.dispatch("fetchProducts");
+    fetchProducts('all')
     return {
       showAddModal,
       closeDeleteModal,
       deleteProduct,
       showDeleteModal,
+      fetchProducts,
       isAlertVisible,
       isDeleteModalVisible,
       productForDelete,
       products,
+   
       isLoading,
       searchValue,
       filteredProduct,
+      filterString
     };
   },
 };
