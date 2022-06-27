@@ -10,7 +10,58 @@
     >
       Add New Order
     </button> -->
-    <hr />
+    <ul class="nav mt-4">
+      <li class="nav-item-tab">
+        <a
+          class="nav-link text-black"
+          :class="{
+            'border-bottom border-dark border-2': filterString == 'all',
+          }"
+          role="button"
+          @click="fetchOrders('all')"
+        >
+          All orders
+        </a>
+      </li>
+      <li class="nav-item">
+        <a
+          class="nav-link text-black"
+          role="button"
+          :class="{
+            'border-bottom border-dark border-2': filterString == 'completed',
+          }"
+          @click="fetchOrders('completed')"
+        >
+          Completed
+        </a>
+      </li>
+      <li class="nav-item">
+        <a
+          class="nav-link text-black"
+          role="button"
+          :class="{
+            'border-bottom border-dark border-2': filterString == 'pending',
+          }"
+          @click="fetchOrders('pending')"
+        >
+          Pending
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a
+          class="nav-link text-black"
+          role="button"
+          :class="{
+            'border-bottom border-dark border-2': filterString == 'canceled',
+          }"
+          @click="fetchOrders('canceled')"
+        >
+          Canceled
+        </a>
+      </li>
+    </ul>
+    <hr class="my-0" />
     <div class="d-flex p-2 selection-bar justify-content-between">
       <div class="position-relative w-50 me-2">
         <input
@@ -53,13 +104,23 @@
         <th><span class="sr-only">Action</span></th>
       </tr>
       <tr v-for="(order, index) in orders" :key="order.id">
-        <td>{{ index + 1 }}</td>
+        <td>{{ pageNo * perPage - perPage + index + 1 }}</td>
         <td>{{ order.order_ref }}</td>
-        <td class="text-capitalize">{{ order.first_name + " " + order.last_name }}</td>
-        <td>{{ (new Date(order.order_date)).toString().split(' ').slice(0,4).join(' ')  }}</td>
+        <td class="text-capitalize">
+          {{ order.first_name + " " + order.last_name }}
+        </td>
+        <td>
+          {{
+            new Date(order.order_date)
+              .toString()
+              .split(" ")
+              .slice(0, 4)
+              .join(" ")
+          }}
+        </td>
         <td>{{ order.shop_name }}</td>
         <td>{{ order.order_status }}</td>
-        <td>{{order.payment_type}}</td>
+        <td>{{ order.payment_type }}</td>
         <td>
           <span class="me-2" @click="showDetail(order.id)" role="button"
             ><i class="far fa-eye"></i
@@ -71,6 +132,32 @@
       </tr>
     </table>
   </div>
+ <!-- pagination -->
+  <div class="d-flex justify-content-end mb-3 me-2">
+    <div class="me-3">
+      <select
+        @change="handlePerPage()"
+        v-model="perPage"
+        class="form-select"
+        aria-label="perPage"
+      >
+        <option value="5">5</option>
+        <option value="10" selected>10</option>
+        <option value="25">25</option>
+        <option value="50">50</option>
+        <option value="100">100</option>
+      </select>
+    </div>
+      <paginate
+    :page-count="totalPage"
+    :click-handler="fetchByPageNo"
+    :prev-text="'Prev'"
+    :next-text="'Next'"
+    :container-class="'d-flex nav page-item'"
+  >
+  </paginate>
+    </div>
+
   <!-- add orders -->
   <base-modal
     :modalState="isAddModalVisible"
@@ -145,8 +232,13 @@
 <script>
 import apiClient from "../resources/baseUrl";
 import useValidate from "@vuelidate/core";
+import Paginate from "vuejs-paginate-next";
+
 import { required, helpers } from "@vuelidate/validators";
 export default {
+  components: {
+    Paginate,
+  },
   data() {
     return {
       v$: useValidate(),
@@ -154,7 +246,7 @@ export default {
       isDeleteModalVisible: false,
       orderForDelete: {},
       alertMessage: "",
-
+      filterString: "all",
       isLoading: false,
       orders: [],
       order: {
@@ -167,6 +259,10 @@ export default {
       // to use add modal as edit depend on the condition and #forUpdate to
       //chage the action which should be performed
       forUpdate: false,
+      //paginate
+      perPage: 10,
+      pageNo: 1,
+      totalPage: "",
     };
   },
   methods: {
@@ -185,8 +281,8 @@ export default {
     closeDeleteModal() {
       this.isDeleteModalVisible = false;
     },
-    showDetail(id){
-       this.$router.push({name:'OrderDetail', params:{id:id}})
+    showDetail(id) {
+      this.$router.push({ name: "OrderDetail", params: { id: id } });
     },
     // showEditModal({ ...order }) {
     //   this.forUpdate = true;
@@ -200,7 +296,7 @@ export default {
     },
     AddOrderPage() {
       // this.isAddModalVisible = true;
-      this.$router.push({name:'AddNewOrder'})
+      this.$router.push({ name: "AddNewOrder" });
     },
     // async updateOrder() {
     //   this.v$.$validate();
@@ -274,12 +370,18 @@ export default {
         this.closeDeleteModal();
       }
     },
-    async fetchOrders() {
+    async fetchOrders(filterQuery) {
       try {
         this.$store.commit("setIsLoading", true);
-        const response = await apiClient.get(`/api/all_orders`);
+        const response = await apiClient.get(
+          `/api/all_orders?filter=${filterQuery}&&page=${this.pageNo}&&per_page=${this.perPage}`
+        );
         if (response.status === 200) {
           this.orders = response.data.data;
+          this.filterString = filterQuery;
+          this.perPage = response.data.meta.per_page;
+          this.pageNo = response.data.meta.current_page;
+          this.totalPage = response.data.meta.last_page;
         }
       } catch (e) {
         //
@@ -287,9 +389,17 @@ export default {
         this.$store.commit("setIsLoading", false);
       }
     },
+    //paginations
+    fetchByPageNo(no) {
+      this.pageNo = no;
+      this.fetchOrders(this.filterString);
+    },
+    handlePerPage() {
+      this.fetchOrders(this.filterString);
+    },
   },
   created() {
-    this.fetchOrders();
+    this.fetchOrders("all");
   },
   beforeUnmount() {
     clearTimeout(this.timeout);

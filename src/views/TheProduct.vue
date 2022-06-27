@@ -7,43 +7,77 @@
       description, stock, price and more.
     </div>
     <div class="d-flex justify-content-between mt-4">
-       <ul class="nav">
-  <li class="nav-item-tab">
-  <a  class="nav-link text-black " :class="{'border-bottom border-dark border-2' :filterString=='all'}" role="button" @click="fetchProducts('all')">
-        All Products
-   </a>  </li>
-  <li class="nav-item " >
-  <a  class="nav-link text-black" role="button" :class="{'border-bottom border-dark border-2' :filterString=='outstock'}" @click="fetchProducts('outstock')">
-        Out Stock
-   </a>  </li>
-  <li class="nav-item">
-   <a  class="nav-link text-black" role="button" :class="{'border-bottom border-dark border-2' :filterString=='instock'}" @click="fetchProducts('instock')">
-        In stock
-   </a>  
-   </li>
+      <ul class="nav">
+        <li class="nav-item-tab">
+          <a
+            class="nav-link text-black"
+            :class="{
+              'border-bottom border-dark border-2': filterString == 'all',
+            }"
+            role="button"
+            @click="fetchProducts('all')"
+          >
+            All Products
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link text-black"
+            role="button"
+            :class="{
+              'border-bottom border-dark border-2': filterString == 'outstock',
+            }"
+            @click="fetchProducts('outstock')"
+          >
+            Out Stock
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link text-black"
+            role="button"
+            :class="{
+              'border-bottom border-dark border-2': filterString == 'instock',
+            }"
+            @click="fetchProducts('instock')"
+          >
+            In stock
+          </a>
+        </li>
 
-    <li class="nav-item">
-   <a  class="nav-link text-black" role="button" :class="{'border-bottom border-dark border-2' :filterString=='active'}"  @click="fetchProducts('active')">
-        Active
-   </a>  
-   </li>
+        <li class="nav-item">
+          <a
+            class="nav-link text-black"
+            role="button"
+            :class="{
+              'border-bottom border-dark border-2': filterString == 'active',
+            }"
+            @click="fetchProducts('active')"
+          >
+            Active
+          </a>
+        </li>
 
-    <li class="nav-item">
-   <a  class="nav-link text-black " role="button" :class="{'border-bottom border-dark border-2' :filterString=='inactive'}"  @click="fetchProducts('inactive')">
-        In Active
-   </a>  
-   </li>
-</ul>
-      <button
-      @click="showAddModal"
-      class="btn btn-bg-primary mb-1 text-light"
-    >
-      Add New Product
-    </button>
+        <li class="nav-item">
+          <a
+            class="nav-link text-black"
+            role="button"
+            :class="{
+              'border-bottom border-dark border-2': filterString == 'inactive',
+            }"
+            @click="fetchProducts('inactive')"
+          >
+            In Active
+          </a>
+        </li>
+      </ul>
+      <button @click="showAddModal" class="btn btn-bg-primary mb-1 text-light">
+        Add New Product
+      </button>
     </div>
-    
-    <hr class="my-0"/>
-    <div class="d-flex  p-2 selection-bar justify-content-between">
+
+    <hr class="my-0" />
+    <div class="d-flex p-2 selection-bar justify-content-between">
       <div class="position-relative w-50 me-2">
         <input
           type="text"
@@ -53,7 +87,7 @@
           aria-label="Recipient's username"
           aria-describedby="basic-add"
         />
-        <span role="button" class="position-absolute  end-0 top-0 p-2 me-2"
+        <span role="button" class="position-absolute end-0 top-0 p-2 me-2"
           ><i class="fas fa-search"></i
         ></span>
       </div>
@@ -86,14 +120,14 @@
         <th>Status</th>
         <th><span class="sr-only">Action</span></th>
       </tr>
-      <tr v-for="(product, index) in filteredProduct" :key="product.id">
-        <td>{{ pageNo*perPage-perPage + index + 1 }}</td>
+      <tr v-for="(product, index) in products" :key="product.id">
+        <td>{{ pageNo * perPage - perPage + index + 1 }}</td>
         <td style="white-space: nowrap">{{ product.model }}</td>
         <td>
           <img
             :src="product.images?.path"
-            width="100"
-            height="100"
+            width="80"
+            height="70"
             alt="product image"
           />
         </td>
@@ -104,7 +138,7 @@
         <td>{{ product.category?.title }}</td>
         <td>{{ product.is_active ? "Active" : "In active" }}</td>
         <td class="d-flex">
-           <span
+          <span
             class="me-2"
             @click="
               $router.push({
@@ -134,25 +168,31 @@
     </table>
   </div>
   <!-- pagination -->
-<div class="d-flex justify-content-end mb-3 me-2">
-  <div class="me-3">
-    <select @change="handlePagerPage()" v-model="perPage" class="form-select" aria-label="perPage">
-      <option value="5">5</option>
-      <option value="10" selected>10</option>
-      <option value="25">25</option>
-      <option value="50">50</option>
-      <option value="100">100</option>
-    </select>
+  <div class="d-flex justify-content-end mb-3 me-2">
+    <div class="me-3">
+      <select
+        @change="handlePerPage()"
+        v-model="perPage"
+        class="form-select"
+        aria-label="perPage"
+      >
+        <option value="5">5</option>
+        <option value="10" selected>10</option>
+        <option value="25">25</option>
+        <option value="50">50</option>
+        <option value="100">100</option>
+      </select>
+    </div>
+
+    <paginate
+      :page-count="totalPage"
+      :click-handler="fetchByPageNo"
+      :prev-text="'Prev'"
+      :next-text="'Next'"
+      :container-class="'d-flex nav page-item'"
+    >
+    </paginate>
   </div>
-  
-  <paginate
-   :page-count="totalPage"
-   :click-handler="fetchByPageNo"
-   :prev-text="'Prev'"
-   :next-text="'Next'"
-   :container-class="'d-flex nav page-item'">
-  </paginate>
-</div>
   <!-- delete base modal -->
   <base-modal
     :modalState="isDeleteModalVisible"
@@ -166,7 +206,6 @@
     <p>{{ productForDelete?.name }}</p>
   </base-modal>
 
-
   <the-alert
     :isVisible="isAlertVisible"
     message="Faild to delete product"
@@ -179,57 +218,61 @@ import apiClient from "../resources/baseUrl";
 import Paginate from "vuejs-paginate-next";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
-import { ref, onBeforeUnmount, computed } from "vue";
+import { ref, onBeforeUnmount } from "vue";
 export default {
-  components: {Paginate},
+  components: { Paginate },
   setup() {
     const store = useStore();
     const router = useRouter();
     var isDeleteModalVisible = ref(false);
-    var products = ref([])
+    var products = ref([]);
     // const products = computed(() => store.getters.products);
     var isLoading = ref(false);
     var productForDelete = ref();
     var isAlertVisible = ref(false);
     var timeout = ref(false);
     var searchValue = ref("");
-    var filterString =ref('all')
-    var perPage=ref(10)
-    var pageNo=ref(1)
-    var totalPage=ref()
-    var filteredProduct = computed(() => {
-      if (searchValue.value == "") {
-        return products.value;
-      }
-      return products.value.filter((product) =>
-        product.name.toLowerCase().includes(searchValue.value.toLowerCase())
-      );
-    });
-   const fetchByPageNo= async function(no){
-    pageNo.value= no
-      fetchProducts(filterString.value)
-   }
-   const handlePagerPage= async function(){
-    fetchProducts(filterString.value)
-   }
-    const fetchProducts= async function(query){
-       try {
+    var filterString = ref("all");
+    var perPage = ref(10);
+    var pageNo = ref(1);
+    var totalPage = ref();
+    // var filteredProduct = computed(() => {
+    //   if (searchValue.value == "") {
+    //     return products.value;
+    //   }
+    //   return products.value.filter((product) =>
+    //     product.name.toLowerCase().includes(searchValue.value.toLowerCase())
+    //   );
+    // });
+    const searchProduct = async function () {
+      fetchProducts(filterString.value);
+    };
+    const fetchByPageNo = async function (no) {
+      pageNo.value = no;
+      fetchProducts(filterString.value);
+    };
+    const handlePerPage = async function () {
+      fetchProducts(filterString.value);
+    };
+    const fetchProducts = async function (query) {
+      try {
         store.commit("setIsLoading", true);
-        const response = await apiClient.get(`/api/products?filter=${query}&&page=${pageNo.value}&&per_page=${perPage.value}`);
+        const response = await apiClient.get(
+          `/api/products?filter=${query}&&page=${pageNo.value}&&per_page=${perPage.value}`
+        );
         if (response.status === 200) {
           products.value = response.data.data;
-          filterString.value=query
-          perPage.value= response.data.meta.per_page
-          pageNo.value =  response.data.meta.current_page
-          totalPage.value = response.data.meta.last_page
+          filterString.value = query;
+          perPage.value = response.data.meta.per_page;
+          pageNo.value = response.data.meta.current_page;
+          totalPage.value = response.data.meta.last_page;
         }
       } catch (e) {
         //
       } finally {
         store.commit("setIsLoading", false);
       }
-       
-    }
+    };
     var showAddModal = function () {
       router.push({ name: "AddProduct" });
       // productForDelete.value= product
@@ -249,9 +292,8 @@ export default {
         // const response = await apiClient.delete(
         //   `/api/products/${productForDelete.value.id}`
         // );
-        store.dispatch('deleteProducts', productForDelete.value.id)
-          closeDeleteModal();
-        
+        store.dispatch("deleteProducts", productForDelete.value.id);
+        closeDeleteModal();
       } catch (e) {
         isAlertVisible.value = true;
       } finally {
@@ -270,7 +312,7 @@ export default {
       clearTimeout(timeout);
     });
     // store.dispatch("fetchProducts");
-    fetchProducts('all')
+    fetchProducts("all");
     return {
       showAddModal,
       closeDeleteModal,
@@ -278,22 +320,20 @@ export default {
       showDeleteModal,
       fetchProducts,
       fetchByPageNo,
-      handlePagerPage,
+      handlePerPage,
+      searchProduct,
       isAlertVisible,
       isDeleteModalVisible,
       productForDelete,
       products,
       isLoading,
       searchValue,
-      filteredProduct,
       filterString,
       perPage,
       pageNo,
-      totalPage
+      totalPage,
     };
   },
 };
 </script>
-<style scoped>
-
-</style>
+<style scoped></style>
