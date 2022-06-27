@@ -6,8 +6,8 @@
       details. You can view and edit many information such as product name,
       description, stock, price and more.
     </div>
-    <div class="d-flex justify-content-between">
-       <ul class="nav mt-4">
+    <div class="d-flex justify-content-between mt-4">
+       <ul class="nav">
   <li class="nav-item-tab">
   <a  class="nav-link text-black " :class="{'border-bottom border-dark border-2' :filterString=='all'}" role="button" @click="fetchProducts('all')">
         All Products
@@ -36,13 +36,13 @@
 </ul>
       <button
       @click="showAddModal"
-      class="btn btn-bg-primary text-light"
+      class="btn btn-bg-primary mb-1 text-light"
     >
       Add New Product
     </button>
     </div>
     
-    <hr />
+    <hr class="my-0"/>
     <div class="d-flex  p-2 selection-bar justify-content-between">
       <div class="position-relative w-50 me-2">
         <input
@@ -87,7 +87,7 @@
         <th><span class="sr-only">Action</span></th>
       </tr>
       <tr v-for="(product, index) in filteredProduct" :key="product.id">
-        <td>{{ index + 1 }}</td>
+        <td>{{ pageNo*perPage-perPage + index + 1 }}</td>
         <td style="white-space: nowrap">{{ product.model }}</td>
         <td>
           <img
@@ -133,7 +133,26 @@
       </tr>
     </table>
   </div>
-
+  <!-- pagination -->
+<div class="d-flex justify-content-end mb-3 me-2">
+  <div class="me-3">
+    <select @change="handlePagerPage()" v-model="perPage" class="form-select" aria-label="perPage">
+      <option value="5">5</option>
+      <option value="10" selected>10</option>
+      <option value="25">25</option>
+      <option value="50">50</option>
+      <option value="100">100</option>
+    </select>
+  </div>
+  
+  <paginate
+   :page-count="totalPage"
+   :click-handler="fetchByPageNo"
+   :prev-text="'Prev'"
+   :next-text="'Next'"
+   :container-class="'d-flex nav page-item'">
+  </paginate>
+</div>
   <!-- delete base modal -->
   <base-modal
     :modalState="isDeleteModalVisible"
@@ -146,6 +165,8 @@
     <p>Do u want to delete?</p>
     <p>{{ productForDelete?.name }}</p>
   </base-modal>
+
+
   <the-alert
     :isVisible="isAlertVisible"
     message="Faild to delete product"
@@ -155,11 +176,12 @@
 
 <script>
 import apiClient from "../resources/baseUrl";
+import Paginate from "vuejs-paginate-next";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import { ref, onBeforeUnmount, computed } from "vue";
 export default {
-  components: {},
+  components: {Paginate},
   setup() {
     const store = useStore();
     const router = useRouter();
@@ -172,7 +194,9 @@ export default {
     var timeout = ref(false);
     var searchValue = ref("");
     var filterString =ref('all')
-
+    var perPage=ref(10)
+    var pageNo=ref(1)
+    var totalPage=ref()
     var filteredProduct = computed(() => {
       if (searchValue.value == "") {
         return products.value;
@@ -181,16 +205,23 @@ export default {
         product.name.toLowerCase().includes(searchValue.value.toLowerCase())
       );
     });
-
+   const fetchByPageNo= async function(no){
+    pageNo.value= no
+      fetchProducts(filterString.value)
+   }
+   const handlePagerPage= async function(){
+    fetchProducts(filterString.value)
+   }
     const fetchProducts= async function(query){
-      //  store.dispatch(fetchProducts,query)
        try {
         store.commit("setIsLoading", true);
-        const response = await apiClient.get(`/api/products?filter=${query}`);
+        const response = await apiClient.get(`/api/products?filter=${query}&&page=${pageNo.value}&&per_page=${perPage.value}`);
         if (response.status === 200) {
           products.value = response.data.data;
-          console.log('response', response.data.data)
           filterString.value=query
+          perPage.value= response.data.meta.per_page
+          pageNo.value =  response.data.meta.current_page
+          totalPage.value = response.data.meta.last_page
         }
       } catch (e) {
         //
@@ -246,16 +277,23 @@ export default {
       deleteProduct,
       showDeleteModal,
       fetchProducts,
+      fetchByPageNo,
+      handlePagerPage,
       isAlertVisible,
       isDeleteModalVisible,
       productForDelete,
       products,
-   
       isLoading,
       searchValue,
       filteredProduct,
-      filterString
+      filterString,
+      perPage,
+      pageNo,
+      totalPage
     };
   },
 };
 </script>
+<style scoped>
+
+</style>
