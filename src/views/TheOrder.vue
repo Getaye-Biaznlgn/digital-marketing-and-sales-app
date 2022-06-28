@@ -395,6 +395,7 @@ export default {
       this.fetchOrders(this.filterString);
     },
     handlePerPage() {
+      this.pageNo=1
       this.fetchOrders(this.filterString);
     },
   },

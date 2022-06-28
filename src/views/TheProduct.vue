@@ -85,9 +85,10 @@
           class="form-control rounded-pill pe-5"
           placeholder="Search by name"
           aria-label="Recipient's username"
+          @keyup.enter="searchProduct(searchValue)"
           aria-describedby="basic-add"
         />
-        <span role="button" class="position-absolute end-0 top-0 p-2 me-2"
+        <span @click="searchProduct(searchValue)" role="button" class="position-absolute end-0 top-0 p-2 me-2"
           ><i class="fas fa-search"></i
         ></span>
       </div>
@@ -136,7 +137,7 @@
         <td>{{ product.qty }}</td>
         <td>{{ product.weight }}</td>
         <td>{{ product.category?.title }}</td>
-        <td>{{ product.is_active ? "Active" : "In active" }}</td>
+        <td style="white-space:nowrap;">{{ product.is_active ? "Active" : "In active" }}</td>
         <td class="d-flex">
           <span
             class="me-2"
@@ -244,19 +245,37 @@ export default {
     //     product.name.toLowerCase().includes(searchValue.value.toLowerCase())
     //   );
     // });
-    const searchProduct = async function () {
-      fetchProducts(filterString.value);
+    const searchProduct = async function (searchQuery) {
+       try {
+        store.commit("setIsLoading", true);
+        const response = await apiClient.get(
+          `/api/search?search=${searchQuery}`
+        );
+        if (response.status === 200) {
+          products.value = response.data.data;
+          filterString.value = '';
+          perPage.value = response.data.meta.per_page;
+          pageNo.value = response.data.meta.current_page;
+          totalPage.value = response.data.meta.last_page;
+        }
+      } catch (e) {
+        //
+      } finally {
+        store.commit("setIsLoading", false);
+      }
     };
     const fetchByPageNo = async function (no) {
       pageNo.value = no;
       fetchProducts(filterString.value);
     };
     const handlePerPage = async function () {
+      pageNo.value=1
       fetchProducts(filterString.value);
     };
     const fetchProducts = async function (query) {
       try {
         store.commit("setIsLoading", true);
+        searchValue.value=''
         const response = await apiClient.get(
           `/api/products?filter=${query}&&page=${pageNo.value}&&per_page=${perPage.value}`
         );
@@ -273,6 +292,8 @@ export default {
         store.commit("setIsLoading", false);
       }
     };
+
+    
     var showAddModal = function () {
       router.push({ name: "AddProduct" });
       // productForDelete.value= product

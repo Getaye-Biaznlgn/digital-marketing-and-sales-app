@@ -1,14 +1,71 @@
 <template>
   <div class="m-3">
     <h5>Agent Shop</h5>
-    <button
-      @click="navigateToAddShop"
-      class="btn ms-auto d-flex justify-self-end btn-bg-primary text-light"
-    >
-      Add New Shop/Agent
-    </button>
-    <hr />
-    <div class="d-flex  p-2 selection-bar justify-content-between">
+    <div class="d-flex justify-content-between">
+      <ul class="nav mt-4">
+        <li class="nav-item-tab">
+          <a
+            class="nav-link text-black"
+            :class="{
+              'border-bottom border-dark border-2': filterString == 'all',
+            }"
+            role="button"
+            @click="fetchOrders('all')"
+          >
+            All orders
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link text-black"
+            role="button"
+            :class="{
+              'border-bottom border-dark border-2': filterString == 'completed',
+            }"
+            @click="fetchOrders('completed')"
+          >
+            Completed
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link text-black"
+            role="button"
+            :class="{
+              'border-bottom border-dark border-2': filterString == 'pending',
+            }"
+            @click="fetchOrders('pending')"
+          >
+            Pending
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a
+            class="nav-link text-black"
+            role="button"
+            :class="{
+              'border-bottom border-dark border-2': filterString == 'canceled',
+            }"
+            @click="fetchOrders('canceled')"
+          >
+            Canceled
+          </a>
+        </li>
+      </ul>
+         <div>
+           <button
+        @click="navigateToAddShop"
+        class="btn ms-auto d-flex justify-self-end btn-bg-primary text-light"
+      >
+        Add New Shop/Agent
+      </button>
+         </div>
+     
+    </div>
+
+    <hr class="my-0" />
+    <div class="d-flex p-2 selection-bar justify-content-between">
       <div class="position-relative w-50 me-2">
         <input
           type="text"
@@ -18,7 +75,7 @@
           aria-label="Recipient's username"
           aria-describedby="basic-add"
         />
-        <span role="button" class="position-absolute  end-0 top-0 p-2 me-2"
+        <span role="button" class="position-absolute end-0 top-0 p-2 me-2"
           ><i class="fas fa-search"></i
         ></span>
       </div>
@@ -51,14 +108,14 @@
       </tr>
       <tr v-for="(shop, index) in shops" :key="shop.id" class="text-capitalize">
         <td>{{ index + 1 }}</td>
-        <td>{{ shop.shop_name }}</td>
+        <td>{{ shop.name }}</td>
         <td>{{ shop.region }}</td>
         <td>{{ shop.zone }}</td>
         <td>{{ shop.city }}</td>
-        <td> <span v-if="shop.manager">{{ shop.manager?.first_name + " " + shop.manager?.last_name }}</span>
-             <span v-else>--|--</span>
+        <td>
+          <span>{{ shop.first_name + " " + shop.last_name }}</span>
         </td>
-        <td>{{ shop.is_active ? "Active" : "In active" }}</td>
+        <td>{{ shop.shop_status ? "Active" : "In active" }}</td>
         <td>
           <span class="me-2" @click="showEditModal(shop)" role="button"
             ><i class="far fa-edit"></i
@@ -66,7 +123,13 @@
           <span class="me-2" @click="showDeleteModal(shop)" role="button"
             ><i class="fas fa-trash"></i
           ></span>
-          <span @click="$router.push({name:'ShopDetail', params:{id:shop.id}})" role="button"><i class="fas fa-eye"></i></span>
+          <span
+            @click="
+              $router.push({ name: 'ShopDetail', params: { id: shop.id } })
+            "
+            role="button"
+            ><i class="fas fa-eye"></i
+          ></span>
         </td>
       </tr>
     </table>
@@ -79,18 +142,18 @@
     @close="closeEditModal"
     @submit="updateShop"
   >
-    <div class="mb-3" :class="{ warining: v$.shop.shop_name.$error }">
-      <label for="shop_name" class="form-label">Shop name</label>
+    <div class="mb-3" :class="{ warining: v$.shop.name.$error }">
+      <label for="name" class="form-label">Shop name</label>
       <input
         type="text"
         class="form-control"
-        id="shop_name"
-        v-model.trim="shop.shop_name"
-        @blur="v$.shop.shop_name.$touch"
+        id="name"
+        v-model.trim="shop.name"
+        @blur="v$.shop.name.$touch"
       />
       <span
         class="error-msg mt-1"
-        v-for="(error, index) of v$.shop.shop_name.$errors"
+        v-for="(error, index) of v$.shop.name.$errors"
         :key="index"
       >
         {{ error.$message + ", " }}</span
@@ -147,6 +210,17 @@
         {{ error.$message + ", " }}</span
       >
     </div>
+    <div class="mt-3">
+      <div class="form-check">
+        <input
+          class="form-check-input"
+          type="checkbox"
+          v-model="shop.shop_status"
+          id="flexCheckDefault"
+        />
+        <label class="form-check-label" for="flexCheckDefault"> Active </label>
+      </div>
+    </div>
   </base-modal>
 
   <!-- delete base modal -->
@@ -160,7 +234,7 @@
   >
     <p>
       Do u want to delete? <br />
-      {{ shopForDelete?.shop_name }}
+      {{ shopForDelete?.name }}
     </p>
   </base-modal>
 
@@ -267,7 +341,7 @@ export default {
         this.$store.commit("setIsLoading", true);
         const response = await apiClient.get(`/api/shops`);
         if (response.status === 200) {
-          this.shops = response.data;
+          this.shops = response.data.data;
         }
       } catch (e) {
         //
@@ -285,7 +359,7 @@ export default {
   validations() {
     return {
       shop: {
-        shop_name: {
+        name: {
           required: helpers.withMessage("Shop name is required", required),
           max: helpers.withMessage(
             "Name should not be greater than 50 characters",

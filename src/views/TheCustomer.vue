@@ -1,6 +1,6 @@
 <template>
   <div class="m-3">
-    <h5>Product customer</h5>
+    <h5>Customer</h5>
     <div>
       In the customer section, you will review and manage all solar product
       customers.
@@ -16,13 +16,14 @@
     <div class="position-relative w-50  me-2">
         <input
           type="text"
-          v-model="searchValue"
+          v-model="searchQuery"
+          @keyup.enter="searchCustomers"
           class="form-control rounded-pill pe-5"
           placeholder="Search by name"
           aria-label="Recipient's username"
           aria-describedby="basic-add"
         />
-        <span role="button" class="position-absolute  end-0 top-0 p-2 me-2"
+        <span @click="searchCustomers" role="button" class="position-absolute  end-0 top-0 p-2 me-2"
           ><i class="fas fa-search"></i
         ></span>
       </div>
@@ -54,7 +55,7 @@
         <th><span class="sr-only">Action</span></th>
       </tr>
       <tr v-for="(customer, index) in customers" :key="customer.id">
-        <td>{{ index + 1 }}</td>
+        <td>{{ pageNo * perPage - perPage + index + 1 }}</td>
         <td class="text-capitalize">
           {{ customer.first_name + " " + customer.last_name }}
         </td>
@@ -64,17 +65,84 @@
           ><span v-else>--/--</span>
         </td>
         <td>{{ customer.user_region??''}}-{{customer.user_woreda??''}}</td>
+        <td>{{customer.customer_status===1? 'Active': 'Inactive'}}</td>
         <td>
-          <span class="me-2" @click="showEditModal(customer)" role="button"
+          <!-- <span class="me-2" @click="showEditModal(customer)" role="button"
             ><i class="far fa-edit"></i
           ></span>
-          <span @click="showDeleteModal(customer)" role="button"
+          <span  role="button"
             ><i class="fas fa-trash"></i
-          ></span>
+          ></span> -->
+                    <div class="dropdown">
+            <a
+              class="dropdown-toggl text-dark"
+              href="#"
+              role="button"
+              id="dropdownMenuLink"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <i class="fa-solid fa-ellipsis-vertical"></i>
+            </a>
+
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+              <li>
+                <a
+                  class="dropdown-item"
+                  @click="showEditModal(customer)"
+                  role="button"
+                  >Edit</a
+                >
+              </li>
+              <li>
+                <a
+                  class="dropdown-item"
+                  @click="showChangeStatusModal(customer)"
+                  role="button"
+                  >Change Status</a
+                >
+              </li>
+               <li>
+                <a
+                  class="dropdown-item"
+                  @click="showDeleteModal(customer)"
+                  role="button"
+                  >Delete</a
+                >
+              </li>
+            </ul>
+          </div>
         </td>
       </tr>
     </table>
+      <!-- pagination -->
+  <div class="d-flex justify-content-end mt-2 mb-3 me-2">
+    <div class="me-3">
+      <select
+        @change="handlePerPage()"
+        v-model="perPage"
+        class="form-select"
+        aria-label="perPage"
+      >
+        <option value="5">5</option>
+        <option value="10" selected>10</option>
+        <option value="25">25</option>
+        <option value="50">50</option>
+        <option value="100">100</option>
+      </select>
+    </div>
+
+    <paginate
+      :page-count="totalPage"
+      :click-handler="fetchByPageNo"
+      :prev-text="'Prev'"
+      :next-text="'Next'"
+      :container-class="'d-flex nav page-item'"
+    >
+    </paginate>
   </div>
+  </div>
+
   <!-- add customers -->
   <base-modal
     :modalState="isAddModalVisible"
@@ -212,6 +280,39 @@
     </p>
   </base-modal>
 
+  <!-- change status base modal -->
+  <base-modal
+    :modalState="isChangeStatusModalVisible"
+    btnLabel="Change"
+    :isLoading="isLoading"
+    title="Change Status"
+    @close="closeChangeStatusModal"
+    @submit="changeStatus"
+  >
+    <div>
+      <div>Choose Customer status</div>
+      <select
+        id="changeStatus"
+        v-model="customerForChangeStatus.customer_status"
+        class="form-control"
+      >
+        <option
+          :disabled="customerForChangeStatus.customer_status == 0"
+          :value="0"
+        >
+          In active
+        </option>
+        <option
+          :value="1"
+          :disabled="customerForChangeStatus.customer_status == 1"
+        >
+          Active
+        </option>
+       
+      </select>
+    </div>
+  </base-modal>
+
   <!--  -->
   <the-alert
     :isVisible="isAlertVisible"
@@ -223,6 +324,8 @@
 <script>
 import apiClient from "../resources/baseUrl";
 import useValidate from "@vuelidate/core";
+import Paginate from "vuejs-paginate-next";
+
 import {
   required,
   helpers,
@@ -231,13 +334,16 @@ import {
   numeric,
 } from "@vuelidate/validators";
 export default {
+  components:{
+    Paginate
+  },
   data() {
     return {
       v$: useValidate(),
       isAddModalVisible: false,
       isDeleteModalVisible: false,
       customerForDelete: {},
-
+      searchQuery:'',
       isLoading: false,
       customers: [],
       customer: {
@@ -258,6 +364,13 @@ export default {
       // to use add modal as edit depend on the condition and #forUpdate to
       //chage the action which should be performed
       forUpdate: false,
+      //paginate
+      perPage: 10,
+      pageNo: 1,
+      totalPage: "",
+    // 
+    isChangeStatusModalVisible:false,
+    customerForChangeStatus:{}
     };
   },
   methods: {
@@ -281,6 +394,7 @@ export default {
       this.customerForDelete = customer;
       this.isDeleteModalVisible = true;
     },
+
     closeDeleteModal() {
       this.isDeleteModalVisible = false;
     },
@@ -288,6 +402,13 @@ export default {
       this.forUpdate = true;
       this.customer = customer;
       this.isAddModalVisible = true;
+    },
+    showChangeStatusModal({...customer}){
+      this.customerForChangeStatus=customer
+      this.isChangeStatusModalVisible=true
+    },
+    closeChangeStatusModal(){
+      this.isChangeStatusModalVisible=false
     },
     closeAddModal() {
       this.v$.$reset();
@@ -302,6 +423,29 @@ export default {
       this.isAlertVisible = true;
       this.alertMessage = message;
       this.isRequestSucceed = isRequestSucceed;
+    },
+   async changeStatus(){
+          this.isLoading = true;
+      try {
+        const response = await apiClient.post(
+          "/api/change_user_status/" + this.customerForChangeStatus.customer_id,
+          { status: this.customerForChangeStatus.customer_status }
+        );
+        if (response.status === 200) {
+          let index = this.customers.findIndex(
+            (customer) => customer.customer_id === this.customerForChangeStatus.customer_id
+          );
+          this.customers[index].customer_status =
+            this.customerForChangeStatus.customer_status;
+        } else throw "";
+      } catch (e) {
+        this.isAlertVisible = true;
+        this.alertMessage = "Faild to change user status";
+        this.dismissAlert();
+      } finally {
+        this.isLoading = false;
+        this.closeChangeStatusModal();
+      }
     },
     async updateCustomer() {
       this.v$.$validate();
@@ -330,6 +474,7 @@ export default {
         }
       }
     },
+
     async addNewCustomer() {
       if (this.forUpdate) {
         this.updateCustomer();
@@ -374,18 +519,34 @@ export default {
         this.closeDeleteModal();
       }
     },
+    async searchCustomers(){
+        this.pageNo=1
+          this.fetchCustomers()
+    },
     async fetchCustomers() {
       try {
         this.$store.commit("setIsLoading", true);
-        const response = await apiClient.get(`/api/users`);
+        const response = await apiClient.get(`/api/users?search=${this.searchQuery}&&page=${this.pageNo}&&per_page=${this.perPage}`);
         if (response.status === 200) {
           this.customers = response.data.data;
+          this.perPage = response.data.meta.per_page;
+          this.pageNo = response.data.meta.current_page;
+          this.totalPage = response.data.meta.last_page;
         }
       } catch (e) {
         //
       } finally {
         this.$store.commit("setIsLoading", false);
       }
+    },
+     //paginations
+    fetchByPageNo(no) {
+      this.pageNo = no;
+      this.fetchCustomers(this.filterString);
+    },
+    handlePerPage() {
+      this.pageNo=1
+      this.fetchCustomers(this.filterString);
     },
   },
   created() {
