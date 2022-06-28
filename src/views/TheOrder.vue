@@ -18,7 +18,7 @@
             'border-bottom border-dark border-2': filterString == 'all',
           }"
           role="button"
-          @click="fetchOrders('all')"
+          @click="fetchByFilter('all')"
         >
           All orders
         </a>
@@ -30,7 +30,7 @@
           :class="{
             'border-bottom border-dark border-2': filterString == 'completed',
           }"
-          @click="fetchOrders('completed')"
+          @click="fetchByFilter('completed')"
         >
           Completed
         </a>
@@ -42,7 +42,7 @@
           :class="{
             'border-bottom border-dark border-2': filterString == 'pending',
           }"
-          @click="fetchOrders('pending')"
+          @click="fetchByFilter('pending')"
         >
           Pending
         </a>
@@ -55,7 +55,7 @@
           :class="{
             'border-bottom border-dark border-2': filterString == 'canceled',
           }"
-          @click="fetchOrders('canceled')"
+          @click="fetchByFilter('canceled')"
         >
           Canceled
         </a>
@@ -66,13 +66,17 @@
       <div class="position-relative w-50 me-2">
         <input
           type="text"
-          v-model="searchValue"
+          v-model="searchQuery"
           class="form-control rounded-pill pe-5"
           placeholder="Search"
-          aria-label="Recipient's username"
+          @keyup.enter="searchOrders"
+          aria-label="search"
           aria-describedby="basic-add"
         />
-        <span role="button" class="position-absolute end-0 top-0 p-2 me-2"
+        <span
+          @click="searchOrders"
+          role="button"
+          class="position-absolute end-0 top-0 p-2 me-2"
           ><i class="fas fa-search"></i
         ></span>
       </div>
@@ -132,8 +136,10 @@
       </tr>
     </table>
   </div>
- <!-- pagination -->
-  <div class="d-flex justify-content-end mb-3 me-2">
+          <div v-if="!orders.length" class="mt-2 text-center">No record</div>
+
+  <!-- pagination -->
+  <div v-if="!isSearch" class="d-flex justify-content-end mb-3 me-2">
     <div class="me-3">
       <select
         @change="handlePerPage()"
@@ -148,15 +154,16 @@
         <option value="100">100</option>
       </select>
     </div>
-      <paginate
-    :page-count="totalPage"
-    :click-handler="fetchByPageNo"
-    :prev-text="'Prev'"
-    :next-text="'Next'"
-    :container-class="'d-flex nav page-item'"
-  >
-  </paginate>
-    </div>
+    <paginate
+      v-model="pageNo"
+      :page-count="totalPage"
+      :click-handler="fetchByPageNo"
+      :prev-text="'Prev'"
+      :next-text="'Next'"
+      :container-class="'d-flex nav page-item'"
+    >
+    </paginate>
+  </div>
 
   <!-- add orders -->
   <base-modal
@@ -248,6 +255,7 @@ export default {
       alertMessage: "",
       filterString: "all",
       isLoading: false,
+      searchQuery: "",
       orders: [],
       order: {
         title: "",
@@ -263,6 +271,8 @@ export default {
       perPage: 10,
       pageNo: 1,
       totalPage: "",
+      //to make the pagination off on search result
+      isSearch: false,
     };
   },
   methods: {
@@ -370,6 +380,30 @@ export default {
         this.closeDeleteModal();
       }
     },
+
+    async searchOrders() {
+      if (this.searchQuery == "") {
+        this.fetchOrders("all");
+        return;
+      }
+
+      try {
+        this.$store.commit("setIsLoading", true);
+        const response = await apiClient.post(
+          `/api/search_order?search=${this.searchQuery}`
+        );
+        if (response.status === 200) {
+          this.orders = response.data.data;
+          this.filterString = "";
+          this.isSearch = true;
+        }
+      } catch (e) {
+        //
+      } finally {
+        this.$store.commit("setIsLoading", false);
+      }
+    },
+
     async fetchOrders(filterQuery) {
       try {
         this.$store.commit("setIsLoading", true);
@@ -379,6 +413,7 @@ export default {
         if (response.status === 200) {
           this.orders = response.data.data;
           this.filterString = filterQuery;
+          this.isSearch = false;
           this.perPage = response.data.meta.per_page;
           this.pageNo = response.data.meta.current_page;
           this.totalPage = response.data.meta.last_page;
@@ -389,13 +424,17 @@ export default {
         this.$store.commit("setIsLoading", false);
       }
     },
+    fetchByFilter(filter){
+      this.pageNo=1
+     this.fetchOrders(filter)
+    },
     //paginations
     fetchByPageNo(no) {
       this.pageNo = no;
       this.fetchOrders(this.filterString);
     },
     handlePerPage() {
-      this.pageNo=1
+      this.pageNo = 1;
       this.fetchOrders(this.filterString);
     },
   },

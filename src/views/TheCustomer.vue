@@ -115,6 +115,8 @@
         </td>
       </tr>
     </table>
+            <div v-if="!customers.length" class="mt-2 text-center">No record</div>
+
       <!-- pagination -->
   <div class="d-flex justify-content-end mt-2 mb-3 me-2">
     <div class="me-3">
@@ -300,7 +302,7 @@
           :disabled="customerForChangeStatus.customer_status == 0"
           :value="0"
         >
-          In active
+          Inactive
         </option>
         <option
           :value="1"

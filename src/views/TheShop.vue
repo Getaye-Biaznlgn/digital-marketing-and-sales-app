@@ -10,9 +10,9 @@
               'border-bottom border-dark border-2': filterString == 'all',
             }"
             role="button"
-            @click="fetchOrders('all')"
+            @click="fetchByFilter('all')"
           >
-            All orders
+            All shops
           </a>
         </li>
         <li class="nav-item">
@@ -20,11 +20,11 @@
             class="nav-link text-black"
             role="button"
             :class="{
-              'border-bottom border-dark border-2': filterString == 'completed',
+              'border-bottom border-dark border-2': filterString == 'active',
             }"
-            @click="fetchOrders('completed')"
+            @click="fetchByFilter('active')"
           >
-            Completed
+            Active
           </a>
         </li>
         <li class="nav-item">
@@ -32,36 +32,22 @@
             class="nav-link text-black"
             role="button"
             :class="{
-              'border-bottom border-dark border-2': filterString == 'pending',
+              'border-bottom border-dark border-2': filterString == 'inactive',
             }"
-            @click="fetchOrders('pending')"
+            @click="fetchByFilter('inactive')"
           >
-            Pending
-          </a>
-        </li>
-
-        <li class="nav-item">
-          <a
-            class="nav-link text-black"
-            role="button"
-            :class="{
-              'border-bottom border-dark border-2': filterString == 'canceled',
-            }"
-            @click="fetchOrders('canceled')"
-          >
-            Canceled
+            Inactive
           </a>
         </li>
       </ul>
-         <div>
-           <button
-        @click="navigateToAddShop"
-        class="btn ms-auto d-flex justify-self-end btn-bg-primary text-light"
-      >
-        Add New Shop/Agent
-      </button>
-         </div>
-     
+      <div>
+        <button
+          @click="navigateToAddShop"
+          class="btn ms-auto d-flex justify-self-end btn-bg-primary text-light"
+        >
+          Add New Shop/Agent
+        </button>
+      </div>
     </div>
 
     <hr class="my-0" />
@@ -70,12 +56,16 @@
         <input
           type="text"
           v-model="searchValue"
+          @keyup.enter="searchShop"
           class="form-control rounded-pill pe-5"
-          placeholder="Search by name"
-          aria-label="Recipient's username"
+          placeholder="Search by name or city"
+          aria-label="search"
           aria-describedby="basic-add"
         />
-        <span role="button" class="position-absolute end-0 top-0 p-2 me-2"
+        <span
+          @click="searchShop"
+          role="button"
+          class="position-absolute end-0 top-0 p-2 me-2"
           ><i class="fas fa-search"></i
         ></span>
       </div>
@@ -115,8 +105,8 @@
         <td>
           <span>{{ shop.first_name + " " + shop.last_name }}</span>
         </td>
-        <td>{{ shop.shop_status ? "Active" : "In active" }}</td>
-        <td>
+        <td>{{ shop.shop_status ? "Active" : "Inactive" }}</td>
+        <td style="white-space:nowrap;">
           <span class="me-2" @click="showEditModal(shop)" role="button"
             ><i class="far fa-edit"></i
           ></span>
@@ -133,15 +123,42 @@
         </td>
       </tr>
     </table>
+    <div v-if="!shops.length" class="mt-2 text-center">No record</div>
+    <!-- pagination -->
+    <div v-if="!isSearch" class="d-flex justify-content-end my-3 me-2">
+      <div class="me-3">
+        <select
+          @change="handlePerPage()"
+          v-model="perPage"
+          class="form-select"
+          aria-label="perPage"
+        >
+          <option value="5">5</option>
+          <option value="10" selected>10</option>
+          <option value="25">25</option>
+          <option value="50">50</option>
+          <option value="100">100</option>
+        </select>
+      </div>
+      <paginate
+        v-model="pageNo"
+        :page-count="totalPage"
+        :click-handler="fetchByPageNo"
+        :prev-text="'Prev'"
+        :next-text="'Next'"
+        :container-class="'d-flex nav page-item'"
+      >
+      </paginate>
+    </div>
   </div>
+
   <base-modal
     :modalState="isUpdateModalVisible"
     btnLabel="Save"
     :isLoading="isLoading"
     title="Shop"
     @close="closeEditModal"
-    @submit="updateShop"
-  >
+    @submit="updateShop">
     <div class="mb-3" :class="{ warining: v$.shop.name.$error }">
       <label for="name" class="form-label">Shop name</label>
       <input
@@ -215,7 +232,8 @@
         <input
           class="form-check-input"
           type="checkbox"
-          v-model="shop.shop_status"
+          ref="shopStatus"
+          :checked="shop.shop_status"
           id="flexCheckDefault"
         />
         <label class="form-check-label" for="flexCheckDefault"> Active </label>
@@ -248,15 +266,21 @@
 <script>
 import apiClient from "../resources/baseUrl";
 import useValidate from "@vuelidate/core";
+import Paginate from "vuejs-paginate-next";
 import { required, helpers, maxLength } from "@vuelidate/validators";
 export default {
+  components: {
+    Paginate,
+  },
   data() {
     return {
       v$: useValidate(),
       isUpdateModalVisible: false,
       isDeleteModalVisible: false,
       shopForDelete: {},
+      filterString: "",
       alertMessage: "",
+      searchValue: "",
 
       isLoading: false,
       shops: [],
@@ -265,6 +289,12 @@ export default {
       // alert
       isAlertVisible: false,
       timeout: "",
+      //paginate
+      perPage: 10,
+      pageNo: 1,
+      totalPage: "",
+      //to make the pagination off on search result
+      isSearch: false,
     };
   },
   methods: {
@@ -289,13 +319,19 @@ export default {
       this.$router.push({ name: "AddShop" });
     },
     async updateShop() {
+      // alert('Here we go')
+     this.shop.shop_status=this.$refs.shopStatus.checked
       this.v$.$validate();
       if (!this.v$.$error) {
         this.isLoading = true;
         try {
           const response = await apiClient.put(
             `/api/shops/${this.shop.id}`,
-            this.shop
+            {
+              is_active: this.$refs.shopStatus.checked,
+              ...this.shop
+            }
+            
           );
           if (response.status === 200) {
             const editedIndex = this.shops.findIndex((shop) => {
@@ -336,12 +372,18 @@ export default {
         this.closeDeleteModal();
       }
     },
-    async fetchShops() {
+    async searchShop() {
+      if (this.searchValue == "") return this.fetchShops("all");
+
       try {
         this.$store.commit("setIsLoading", true);
-        const response = await apiClient.get(`/api/shops`);
+        const response = await apiClient.post(
+          `/api/search_shops?search=${this.searchValue}`
+        );
         if (response.status === 200) {
           this.shops = response.data.data;
+          this.filterString = " ";
+          this.isSearch = true;
         }
       } catch (e) {
         //
@@ -349,9 +391,42 @@ export default {
         this.$store.commit("setIsLoading", false);
       }
     },
+    async fetchShops(filterQuery) {
+      try {
+        this.$store.commit("setIsLoading", true);
+        const response = await apiClient.get(
+          `/api/shops?filter=${filterQuery}&&page=${this.pageNo}&&per_page=${this.perPage}`
+        );
+        if (response.status === 200) {
+          this.shops = response.data.data;
+          this.filterString = filterQuery;
+          this.isSearch = false;
+          this.perPage = response.data.meta.per_page;
+          this.pageNo = response.data.meta.current_page;
+          this.totalPage = response.data.meta.last_page;
+        }
+      } catch (e) {
+        //
+      } finally {
+        this.$store.commit("setIsLoading", false);
+      }
+    },
+    fetchByFilter(filter) {
+      this.pageNo = 1;
+      this.fetchShops(filter);
+    },
+    //paginations
+    fetchByPageNo(no) {
+      this.pageNo = no;
+      this.fetchShops(this.filterString);
+    },
+    handlePerPage() {
+      this.pageNo = 1;
+      this.fetchShops(this.filterString);
+    },
   },
   created() {
-    this.fetchShops();
+    this.fetchShops("all");
   },
   beforeUnmount() {
     clearTimeout(this.timeout);
@@ -375,12 +450,12 @@ export default {
         city: {
           required: helpers.withMessage("City is required", required),
         },
-        woreda: {
-          required: helpers.withMessage("Woreda is required", required),
-        },
-        kebele: {
-          required: helpers.withMessage("Kebele is required", required),
-        },
+        // woreda: {
+        //   required: helpers.withMessage("Woreda is required", required),
+        // },
+        // kebele: {
+        //   required: helpers.withMessage("Kebele is required", required),
+        // },
       },
     };
   },

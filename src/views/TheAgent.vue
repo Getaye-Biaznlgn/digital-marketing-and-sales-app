@@ -10,13 +10,14 @@
      <div class="position-relative w-50 me-2">
         <input
           type="text"
-          v-model="searchValue"
+          v-model="searchQuery"
+          @keyup.enter="searchAgent"
           class="form-control rounded-pill pe-5"
           placeholder="Search by name"
           aria-label="Recipient's username"
           aria-describedby="basic-add"
         />
-        <span role="button" class="position-absolute  end-0 top-0 p-2 me-2"
+        <span  @click="searchAgent" role="button" class="position-absolute  end-0 top-0 p-2 me-2"
           ><i class="fas fa-search"></i
         ></span>
       </div>
@@ -48,7 +49,7 @@
         <th><span class="sr-only">Action</span></th>
       </tr>
       <tr v-for="(agent, index) in agents" :key="agent.id">
-        <td>{{ index + 1 }}</td>
+        <td>{{ pageNo * perPage - perPage + index + 1 }}</td>
         <td class="text-capitalize">
           {{ agent.first_name + " " + agent.last_name }}
         </td>
@@ -70,6 +71,34 @@
         </td>
       </tr>
     </table>
+            <div v-if="!agents.length" class="mt-2 text-center">No record</div>
+
+      <!-- pagination -->
+  <div class="d-flex justify-content-end mt-2 mb-3 me-2">
+    <div class="me-3">
+      <select
+        @change="handlePerPage()"
+        v-model="perPage"
+        class="form-select"
+        aria-label="perPage"
+      >
+        <option value="5">5</option>
+        <option value="10" selected>10</option>
+        <option value="25">25</option>
+        <option value="50">50</option>
+        <option value="100">100</option>
+      </select>
+    </div>
+
+    <paginate
+      :page-count="totalPage"
+      :click-handler="fetchByPageNo"
+      :prev-text="'Prev'"
+      :next-text="'Next'"
+      :container-class="'d-flex nav page-item'"
+    >
+    </paginate>
+  </div>
   </div>
   <!-- edit agents -->
   <base-modal
@@ -240,14 +269,19 @@
 <script>
 import apiClient from "../resources/baseUrl";
 import useValidate from "@vuelidate/core";
+import Paginate from "vuejs-paginate-next";
 import { required, helpers, email, maxLength } from "@vuelidate/validators";
 export default {
+  components:{
+     Paginate
+  },
   data() {
     return {
       v$: useValidate(),
       isEditModalVisible: false,
       isDetailModalVisible: false,
       agentForDetail: {},
+      searchQuery:'',
       alertMessage: "",
 
       isLoading: false,
@@ -256,8 +290,11 @@ export default {
       // alert
       isAlertVisible: false,
       timeout: "",
-      // to use add modal as edit depend on the condition and # to
-      //chage the action which should be performed
+     //paginate
+      perPage: 10,
+      pageNo: 1,
+      totalPage: "",
+
     };
   },
   methods: {
@@ -365,16 +402,31 @@ export default {
     async fetchAgents() {
       try {
         this.$store.commit("setIsLoading", true);
-        const response = await apiClient.get(`/api/managers`);
+        const response = await apiClient.get(`/api/managers?search=${this.searchQuery}&&page=${this.pageNo}&&per_page=${this.perPage}`);
         if (response.status === 200) {
           this.agents = response.data.data;
-         
+         this.perPage = response.data.meta.per_page;
+          this.pageNo = response.data.meta.current_page;
+          this.totalPage = response.data.meta.last_page;
         }
       } catch (e) {
         //
       } finally {
         this.$store.commit("setIsLoading", false);
       }
+    },
+    searchAgent(){
+      this.pageNo=1
+      this.fetchAgents()
+    },
+     //paginations
+    fetchByPageNo(no) {
+      this.pageNo = no;
+      this.fetchAgents(this.filterString);
+    },
+    handlePerPage() {
+      this.pageNo=1
+      this.fetchAgents(this.filterString);
     },
   },
   created() {

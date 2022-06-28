@@ -167,6 +167,8 @@
         </td>
       </tr>
     </table>
+            <div v-if="!products.length" class="mt-2 text-center">No record</div>
+
   </div>
   <!-- pagination -->
   <div class="d-flex justify-content-end mb-3 me-2">
