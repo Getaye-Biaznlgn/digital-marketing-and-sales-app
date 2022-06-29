@@ -87,6 +87,11 @@ const routes = [
     component: () => import(/* webpackChunkName: "shop-detail" */ '../views/ShopDetail.vue')
   },
   {
+    path: '/edit-shop/:id',
+    name: 'UpdateShop',
+    component: () => import(/* webpackChunkName: "edit-shop" */ '../views/UpdateShop.vue')
+  },
+  {
     path: '/order-detail/:id',
     name: 'OrderDetail',
     component: () => import(/* webpackChunkName: "order-detail" */ '../views/OrderDetail.vue')

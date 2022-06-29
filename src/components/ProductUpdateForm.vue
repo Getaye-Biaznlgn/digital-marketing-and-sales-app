@@ -5,8 +5,7 @@
         v-model="selectedLanguage"
         class="form-select text-lowercase"
         aria-label="selectFilte"
-        @change="fetchTranslatedProductInfo"
-      >
+        @change="fetchTranslatedProductInfo">
         <option v-for="lang in languages" :key="lang.id" :value="lang.code">
           {{ lang.code }}
         </option>
@@ -270,7 +269,6 @@
         class="mt-3"
         title="Save changes"
         :isLoading="isLoading"
-        loadingTitle="Saving"
         @submit="updateProductInfo"
       />
     </form>

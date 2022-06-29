@@ -107,7 +107,9 @@
         </td>
         <td>{{ shop.shop_status ? "Active" : "Inactive" }}</td>
         <td style="white-space:nowrap;">
-          <span class="me-2" @click="showEditModal(shop)" role="button"
+          <span class="me-2" @click="$router.push({
+            name: 'UpdateShop', params:{id:shop.id}
+          })" role="button"
             ><i class="far fa-edit"></i
           ></span>
           <span class="me-2" @click="showDeleteModal(shop)" role="button"
@@ -152,94 +154,15 @@
     </div>
   </div>
 
-  <base-modal
+  <!-- <base-modal
     :modalState="isUpdateModalVisible"
     btnLabel="Save"
     :isLoading="isLoading"
     title="Shop"
     @close="closeEditModal"
     @submit="updateShop">
-    <div class="mb-3" :class="{ warining: v$.shop.name.$error }">
-      <label for="name" class="form-label">Shop name</label>
-      <input
-        type="text"
-        class="form-control"
-        id="name"
-        v-model.trim="shop.name"
-        @blur="v$.shop.name.$touch"
-      />
-      <span
-        class="error-msg mt-1"
-        v-for="(error, index) of v$.shop.name.$errors"
-        :key="index"
-      >
-        {{ error.$message + ", " }}</span
-      >
-    </div>
-    <div class="mb-3" :class="{ warining: v$.shop.region.$error }">
-      <label for="region" class="form-label">Region</label>
-      <input
-        type="text"
-        class="form-control"
-        id="region"
-        v-model.trim="shop.region"
-        @blur="v$.shop.region.$touch"
-      />
-      <span
-        class="error-msg mt-1"
-        v-for="(error, index) of v$.shop.region.$errors"
-        :key="index"
-      >
-        {{ error.$message + ", " }}</span
-      >
-    </div>
-    <div class="mb-3" :class="{ warining: v$.shop.zone.$error }">
-      <label for="zone" class="form-label">Zone</label>
-      <input
-        type="text"
-        class="form-control"
-        id="zone"
-        v-model.trim="shop.zone"
-        @blur="v$.shop.zone.$touch"
-      />
-      <span
-        class="error-msg mt-1"
-        v-for="(error, index) of v$.shop.zone.$errors"
-        :key="index"
-      >
-        {{ error.$message + ", " }}</span
-      >
-    </div>
-    <div class="mb-3" :class="{ warining: v$.shop.city.$error }">
-      <label for="city" class="form-label">City</label>
-      <input
-        type="text"
-        class="form-control"
-        id="city"
-        v-model.trim="shop.city"
-        @blur="v$.shop.city.$touch"
-      />
-      <span
-        class="error-msg mt-1"
-        v-for="(error, index) of v$.shop.city.$errors"
-        :key="index"
-      >
-        {{ error.$message + ", " }}</span
-      >
-    </div>
-    <div class="mt-3">
-      <div class="form-check">
-        <input
-          class="form-check-input"
-          type="checkbox"
-          ref="shopStatus"
-          :checked="shop.shop_status"
-          id="flexCheckDefault"
-        />
-        <label class="form-check-label" for="flexCheckDefault"> Active </label>
-      </div>
-    </div>
-  </base-modal>
+  
+  </base-modal> -->
 
   <!-- delete base modal -->
   <base-modal
@@ -265,9 +188,9 @@
 
 <script>
 import apiClient from "../resources/baseUrl";
-import useValidate from "@vuelidate/core";
 import Paginate from "vuejs-paginate-next";
-import { required, helpers, maxLength } from "@vuelidate/validators";
+import useValidate from "@vuelidate/core";
+// import { required, helpers, maxLength } from "@vuelidate/validators";
 export default {
   components: {
     Paginate,
@@ -275,7 +198,7 @@ export default {
   data() {
     return {
       v$: useValidate(),
-      isUpdateModalVisible: false,
+      // isUpdateModalVisible: false,
       isDeleteModalVisible: false,
       shopForDelete: {},
       filterString: "",
@@ -308,48 +231,47 @@ export default {
     closeDeleteModal() {
       this.isDeleteModalVisible = false;
     },
-    showEditModal({ ...shop }) {
-      this.shop = shop;
-      this.isUpdateModalVisible = true;
-    },
-    closeEditModal() {
-      this.isUpdateModalVisible = false;
-    },
+    // showEditModal({ ...shop }) {
+    //   this.shop = shop;
+    //   this.isUpdateModalVisible = true;
+    // },
+    // closeEditModal() {
+    //   this.isUpdateModalVisible = false;
+    // },
     navigateToAddShop() {
       this.$router.push({ name: "AddShop" });
     },
-    async updateShop() {
-      // alert('Here we go')
-     this.shop.shop_status=this.$refs.shopStatus.checked
-      this.v$.$validate();
-      if (!this.v$.$error) {
-        this.isLoading = true;
-        try {
-          const response = await apiClient.put(
-            `/api/shops/${this.shop.id}`,
-            {
-              is_active: this.$refs.shopStatus.checked,
-              ...this.shop
-            }
+    // async updateShop() {
+    //  this.shop.shop_status=this.$refs.shopStatus.checked
+    //   this.v$.$validate();
+    //   if (!this.v$.$error) {
+    //     this.isLoading = true;
+    //     try {
+    //       const response = await apiClient.put(
+    //         `/api/shops/${this.shop.id}`,
+    //         {
+    //           is_active: this.$refs.shopStatus.checked,
+    //           ...this.shop
+    //         }
             
-          );
-          if (response.status === 200) {
-            const editedIndex = this.shops.findIndex((shop) => {
-              return this.shop.id === shop.id;
-            });
-            this.shops[editedIndex] = this.shop;
-            ///
-          } else throw "";
-        } catch (e) {
-          this.alertMessage = "Faild to update shop";
-          this.isAlertVisible = true;
-          this.dismissAlert();
-        } finally {
-          this.isLoading = false;
-          this.closeEditModal();
-        }
-      }
-    },
+    //       );
+    //       if (response.status === 200) {
+    //         const editedIndex = this.shops.findIndex((shop) => {
+    //           return this.shop.id === shop.id;
+    //         });
+    //         this.shops[editedIndex] = this.shop;
+    //         ///
+    //       } else throw "";
+    //     } catch (e) {
+    //       this.alertMessage = "Faild to update shop";
+    //       this.isAlertVisible = true;
+    //       this.dismissAlert();
+    //     } finally {
+    //       this.isLoading = false;
+    //       this.closeEditModal();
+    //     }
+    //   }
+    // },
 
     async deleteShop() {
       this.isLoading = true;
@@ -431,33 +353,33 @@ export default {
   beforeUnmount() {
     clearTimeout(this.timeout);
   },
-  validations() {
-    return {
-      shop: {
-        name: {
-          required: helpers.withMessage("Shop name is required", required),
-          max: helpers.withMessage(
-            "Name should not be greater than 50 characters",
-            maxLength(50)
-          ),
-        },
-        region: {
-          required: helpers.withMessage("Shop region is required", required),
-        },
-        zone: {
-          required: helpers.withMessage("Zone is required", required),
-        },
-        city: {
-          required: helpers.withMessage("City is required", required),
-        },
-        // woreda: {
-        //   required: helpers.withMessage("Woreda is required", required),
-        // },
-        // kebele: {
-        //   required: helpers.withMessage("Kebele is required", required),
-        // },
-      },
-    };
-  },
+  // validations() {
+  //   return {
+  //     shop: {
+  //       name: {
+  //         required: helpers.withMessage("Shop name is required", required),
+  //         max: helpers.withMessage(
+  //           "Name should not be greater than 50 characters",
+  //           maxLength(50)
+  //         ),
+  //       },
+  //       region: {
+  //         required: helpers.withMessage("Shop region is required", required),
+  //       },
+  //       zone: {
+  //         required: helpers.withMessage("Zone is required", required),
+  //       },
+  //       city: {
+  //         required: helpers.withMessage("City is required", required),
+  //       },
+  //       // woreda: {
+  //       //   required: helpers.withMessage("Woreda is required", required),
+  //       // },
+  //       // kebele: {
+  //       //   required: helpers.withMessage("Kebele is required", required),
+  //       // },
+  //     },
+  //   };
+  // },
 };
 </script>

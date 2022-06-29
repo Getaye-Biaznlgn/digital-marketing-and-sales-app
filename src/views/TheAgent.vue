@@ -65,9 +65,9 @@
           <span class="me-2" @click="showEditModal(agent)" role="button"
             ><i class="far fa-edit"></i
           ></span>
-          <span @click="showDetailModal(agent)" role="button"
+          <!-- <span @click="showDetailModal(agent)" role="button"
             ><i class="fas fa-eye"></i
-          ></span>
+          ></span> -->
         </td>
       </tr>
     </table>
@@ -250,13 +250,13 @@
     </form>
   </base-modal>
 
-  <!-- delete base modal -->
+  <!-- delete base modal
   <base-modal :modalState="isDetailModalVisible" btnLabel="OK" :isLoading="isLoading"
    title="Agent" @close="closeDeleteModal" @submit="closeDeleteModal">
     <p>Agent detail goes here <br>
      {{agentForDetail?.first_name}}
     </p>
-  </base-modal>
+  </base-modal> -->
 
   <!--to show delete image is failed  -->
   <the-alert
@@ -279,7 +279,7 @@ export default {
     return {
       v$: useValidate(),
       isEditModalVisible: false,
-      isDetailModalVisible: false,
+      // isDetailModalVisible: false,
       agentForDetail: {},
       searchQuery:'',
       alertMessage: "",
@@ -306,13 +306,13 @@ export default {
     resetFieldEmpity() {
       (this.agent.title = ""), (this.agent.description = "");
     },
-    showDetailModal({ ...agent }) {
-      this.agentForDetail = agent;
-      this.isDetailModalVisible = true;
-    },
-    closeDeleteModal() {
-      this.isDetailModalVisible = false;
-    },
+    // showDetailModal({ ...agent }) {
+    //   this.agentForDetail = agent;
+    //   this.isDetailModalVisible = true;
+    // },
+    // closeDeleteModal() {
+    //   this.isDetailModalVisible = false;
+    // },
     showEditModal({ ...agent }) {
       this.agent = agent;
       this.agent.phone_number1= agent.phone_numbers[0]

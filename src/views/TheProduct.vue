@@ -15,7 +15,7 @@
               'border-bottom border-dark border-2': filterString == 'all',
             }"
             role="button"
-            @click="fetchProducts('all')"
+            @click="fetchByFilter('all')"
           >
             All Products
           </a>
@@ -27,7 +27,7 @@
             :class="{
               'border-bottom border-dark border-2': filterString == 'outstock',
             }"
-            @click="fetchProducts('outstock')"
+            @click="fetchByFilter('outstock')"
           >
             Out Stock
           </a>
@@ -39,7 +39,7 @@
             :class="{
               'border-bottom border-dark border-2': filterString == 'instock',
             }"
-            @click="fetchProducts('instock')"
+            @click="fetchByFilter('instock')"
           >
             In stock
           </a>
@@ -52,7 +52,7 @@
             :class="{
               'border-bottom border-dark border-2': filterString == 'active',
             }"
-            @click="fetchProducts('active')"
+            @click="fetchByFilter('active')"
           >
             Active
           </a>
@@ -65,7 +65,7 @@
             :class="{
               'border-bottom border-dark border-2': filterString == 'inactive',
             }"
-            @click="fetchProducts('inactive')"
+            @click="fetchByFilter('inactive')"
           >
             In Active
           </a>
@@ -188,6 +188,7 @@
     </div>
 
     <paginate
+      v-model="pageNo"
       :page-count="totalPage"
       :click-handler="fetchByPageNo"
       :prev-text="'Prev'"
@@ -247,6 +248,7 @@ export default {
     //     product.name.toLowerCase().includes(searchValue.value.toLowerCase())
     //   );
     // });
+    
     const searchProduct = async function (searchQuery) {
        try {
         store.commit("setIsLoading", true);
@@ -266,6 +268,10 @@ export default {
         store.commit("setIsLoading", false);
       }
     };
+    const fetchByFilter= async function (filter){
+        pageNo.value=1
+       fetchProducts(filter)
+    }
     const fetchByPageNo = async function (no) {
       pageNo.value = no;
       fetchProducts(filterString.value);
@@ -345,6 +351,7 @@ export default {
       fetchByPageNo,
       handlePerPage,
       searchProduct,
+      fetchByFilter,
       isAlertVisible,
       isDeleteModalVisible,
       productForDelete,
