@@ -6,8 +6,8 @@
     all sales with theier details.
   </div>
 <hr/>
-    <div class="d-flex  p-2 selection-bar justify-content-between">
-      <div class="position-relative w-50 me-2">
+    <div class="d-flex  p-2 selection-bar justify-content-end">
+      <!-- <div class="position-relative w-50 me-2">
         <input
           type="text"
           v-model="searchValue"
@@ -19,7 +19,7 @@
         <span role="button" class="position-absolute  end-0 top-0 p-2 me-2"
           ><i class="fas fa-search"></i
         ></span>
-      </div>
+      </div> -->
 
       <div class="d-flex">
         <div class="pe-2">
@@ -47,35 +47,104 @@
         <th>Shop</th>
         <th>Payment method</th>
         <th>Sales status</th>
-        <th><span class="sr-only">Action</span></th>
+        <!-- <th><span class="sr-only">Action</span></th> -->
       </tr>
-      <tr v-for="(sales, index) in saless"
-        :key="sales.id">
+      <tr v-for="(sale, index) in sales"
+        :key="sale.id">
         <td>{{index+1}}</td>
-        <td>{{sales.first_name+' '+sales.last_name}}</td>
-        <td>{{sales.email}}</td>
-        <td>{{sales.phone_no}}</td>
-        <td>{{sales.region}}</td>
-        <td>{{sales.city}}</td>
+        <td>{{sale.first_name+' '+sale.last_name}}</td>
+        <td>{{sale.order_ref}}</td>
         <td>
-          <span class="me-2" @click="showEditModal(sales)" role="button"
+           {{
+            new Date(sale.order_date)
+              .toString()
+              .split(" ")
+              .slice(0, 4)
+              .join(" ")
+          }}
+        </td>
+        <td>{{sale.total_price}}</td>
+        <td>{{sale.shop_name}}</td>
+        <td>{{sale.payment_type}}</td>
+        <td>{{sale.order_status}}</td>
+        <!-- <td>
+          <span class="me-2" @click="showEditModal(sale)" role="button"
             ><i class="far fa-edit"></i
           ></span>
-          <span  @click="showDeleteModal(sales)" role="button"
+          <span  @click="showDeleteModal(sale)" role="button"
             ><i class="fas fa-trash"></i
           ></span>
-        </td>
+        </td> -->
       </tr>
     </table>
+    <div v-if="!sales.length" class="text-center">No record</div>
 </div>
+ <!-- pagination -->
+  <div class="d-flex justify-content-end mb-3 me-2">
+    <div class="me-3">
+      <select
+        @change="fetchSales"
+        v-model="perPage"
+        class="form-select"
+        aria-label="perPage"
+      >
+        <option :value="5">5</option>
+        <option :value="10">10</option>
+        <option :value="25">25</option>
+        <option :value="50">50</option>
+        <option :value="100">100</option>
+      </select>
+    </div>
+    <paginate
+      v-model="pageNo"
+      :page-count="totalPage"
+      :click-handler="fetchByPageNo"
+      :prev-text="'Prev'"
+      :next-text="'Next'"
+      :container-class="'d-flex nav page-item'"
+    >
+    </paginate>
+  </div>
 </template>
 
 <script>
+import apiClient from '../resources/baseUrl'
+import Paginate from "vuejs-paginate-next";
 export default {
+  components:{
+     Paginate
+  },
   data(){
     return{
-        sales:[]
+        sales:[],
+        //pagination
+        perPage:10,
+        pageNo:1,
+        totalPage:0
     }
+  },
+  methods:{
+      async fetchSales() {
+      try {
+        this.$store.commit("setIsLoading", true);
+        const response = await apiClient.get(
+          `/api/sales?page=${this.pageNo}&&per_page=${this.perPage}`
+        );
+        if (response.status === 200) {
+          this.sales = response.data.data;
+          this.perPage = response.data.meta.per_page;
+          this.pageNo = response.data.meta.current_page;
+          this.totalPage = response.data.meta.last_page;
+        }
+      } catch (e) {
+        //
+      } finally {
+        this.$store.commit("setIsLoading", false);
+      }
+    },
+  },
+  created(){
+    this.fetchSales()
   }
 }
 </script>
