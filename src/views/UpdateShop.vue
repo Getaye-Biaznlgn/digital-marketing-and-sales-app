@@ -121,6 +121,41 @@
                 {{ error.$message + ", " }}</span
               >
             </div>
+             <div v-if="selectedLang=='en'" class="mb-3" :class="{ warining: v$.shop.latitude.$error }">
+              <label for="latitude" class="form-label">Latitude</label>
+              <input
+                type="text"
+                class="form-control"
+                id="latitude"
+                v-model.trim="shop.latitude"
+                @blur="v$.shop.latitude.$touch"
+              />
+              <span
+                class="error-msg mt-1"
+                v-for="(error, index) of v$.shop.latitude.$errors"
+                :key="index"
+              >
+                {{ error.$message + ", " }}</span
+              >
+            </div>
+             <div v-if="selectedLang=='en'" class="mb-3" :class="{ warining: v$.shop.longitude.$error }">
+              <label for="longitude" class="form-label">Longitude</label>
+              <input
+                type="text"
+                class="form-control"
+                id="longitude"
+                v-model.trim="shop.longitude"
+                @blur="v$.shop.longitude.$touch"
+              />
+              <span
+                class="error-msg mt-1"
+                v-for="(error, index) of v$.shop.longitude.$errors"
+                :key="index"
+              >
+                {{ error.$message + ", " }}</span
+              >
+            </div>
+
               <div v-if="selectedLang=='en'" class="mt-3 form-check">
                 <input
                   class="form-check-input"
@@ -276,6 +311,14 @@ export default {
           required: helpers.withMessage("Woreda is required", required),
         },
         kebele: {
+          numeric
+        },
+        latitude: {
+          required: helpers.withMessage("Latitude is required", required),
+          numeric
+        },
+        longitude: {
+          required: helpers.withMessage("Longitude is required", required),
           numeric
         },
       },

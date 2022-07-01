@@ -93,18 +93,16 @@
         ></span>
       </div>
       <div class="d-flex">
-        <div class="pe-2">
+         <div class="pe-2">
           <select class="form-select" v-model="selectedCategory" @change="fetchProducts(filterString)" aria-label="selectFilte">
             <option value="all">All</option>
             <option v-for="category in categories" :key="category.id"  :value="category.id">{{category.title}}</option>
           </select>
         </div>
         <div>
-          <select class="form-select" aria-label="selectFilterRegion">
-            <option value=" ">Sort</option>
-            <option>Sort</option>
-          </select>
+          <button @click="downloadCSV()" class="btn border">Export</button>
         </div>
+        
       </div>
     </div>
     <!-- Table -->
@@ -220,6 +218,7 @@
 <script>
 import apiClient from "../resources/baseUrl";
 import Paginate from "vuejs-paginate-next";
+import exportFromJSON from "export-from-json"
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import { ref, onBeforeUnmount, computed } from "vue";
@@ -251,7 +250,14 @@ export default {
     //     product.name.toLowerCase().includes(searchValue.value.toLowerCase())
     //   );
     // });
+     const downloadCSV=function(){
+        const data = this.products;
+      const fileName = "products";
+      const exportType = exportFromJSON.types.csv;
+      if (data) exportFromJSON({ data, fileName, exportType });
+    }
     const categories= computed(()=>store.getters.categories) 
+
     const searchProduct = async function (searchQuery) {
        try {
         store.commit("setIsLoading", true);
@@ -364,6 +370,7 @@ export default {
       handlePerPage,
       searchProduct,
       fetchByFilter,
+      downloadCSV,
       categories,
       isAlertVisible,
       selectedCategory,

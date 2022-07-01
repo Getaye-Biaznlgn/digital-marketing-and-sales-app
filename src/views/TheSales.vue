@@ -21,18 +21,15 @@
         ></span>
       </div> -->
 
-      <div class="d-flex">
-        <div class="pe-2">
+      <div>
+        <!-- <div class="pe-2">
           <select class="form-select" aria-label="selectFilte">
             <option value=" ">Sort</option>
             <option>Sort</option>
           </select>
-        </div>
+        </div> -->
         <div>
-          <select class="form-select" aria-label="selectFilterRegion">
-            <option value=" ">Sort</option>
-            <option>Sort</option>
-          </select>
+          <button @click="downloadCSV()" class="btn border">Export</button>
         </div>
       </div>
     </div>
@@ -110,6 +107,8 @@
 <script>
 import apiClient from '../resources/baseUrl'
 import Paginate from "vuejs-paginate-next";
+import exportFromJSON from "export-from-json";
+
 export default {
   components:{
      Paginate
@@ -124,6 +123,12 @@ export default {
     }
   },
   methods:{
+    downloadCSV(){
+        const data = this.sales;
+      const fileName = "sales";
+      const exportType = exportFromJSON.types.csv;
+      if (data) exportFromJSON({ data, fileName, exportType });
+    },
       async fetchSales() {
       try {
         this.$store.commit("setIsLoading", true);

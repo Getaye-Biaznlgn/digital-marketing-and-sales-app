@@ -7,9 +7,9 @@
       ><i class="fas fa-arrow-left"></i>Back</span
     >
     <form @submit.prevent class="row mx-2">
-        <base-card class="mt-2 col-lg-6">
+      <base-card class="mt-2 col-lg-6">
         <div class="fs-5 mb-2 fw-bold">Agent shop Info</div>
-        <div class="mb-3" :class="{ warining: v$.shop.shop_name.$error }">
+        <div class="mb-2" :class="{ warining: v$.shop.shop_name.$error }">
           <label for="shop_name" class="form-label">Shop name</label>
           <input
             type="text"
@@ -29,7 +29,7 @@
 
         <div class="row">
           <div
-            class="mb-3 col-md-6"
+            class="mb-2 col-md-6"
             :class="{ warining: v$.shop.region.$error }"
           >
             <label for="region" class="form-label">Region</label>
@@ -48,7 +48,7 @@
               {{ error.$message + ", " }}</span
             >
           </div>
-          <div class="mb-3 col-md-6" :class="{ warining: v$.shop.zone.$error }">
+          <div class="mb-2 col-md-6" :class="{ warining: v$.shop.zone.$error }">
             <label for="zone" class="form-label">Zone</label>
             <input
               type="text"
@@ -69,7 +69,7 @@
 
         <div class="row">
           <div
-            class="mb-3 col-md-6"
+            class="mb-2 col-md-6"
             :class="{ warining: v$.shop.woreda.$error }"
           >
             <label for="woreda" class="form-label">Woreda</label>
@@ -88,7 +88,7 @@
               {{ error.$message + ", " }}</span
             >
           </div>
-          <div class="mb-3 col-md-6" :class="{ warining: v$.shop.city.$error }">
+          <div class="mb-2 col-md-6" :class="{ warining: v$.shop.city.$error }">
             <label for="city" class="form-label">City</label>
             <input
               type="text"
@@ -107,7 +107,7 @@
           </div>
         </div>
 
-        <div class="mb-3" :class="{ warining: v$.shop.kebele.$error }">
+        <div class="mb-2" :class="{ warining: v$.shop.kebele.$error }">
           <label for="kebele" class="form-label">Kebele</label>
           <input
             type="text"
@@ -125,7 +125,7 @@
           >
         </div>
 
-        <div class="mb-3" :class="{ warining: v$.shop.house_no.$error }">
+        <div class="mb-2" :class="{ warining: v$.shop.house_no.$error }">
           <label for="house_no" class="form-label">House no</label>
           <input
             type="text"
@@ -142,14 +142,37 @@
             {{ error.$message + ", " }}</span
           >
         </div>
+        <div class="row mb-2">
+          <div class="col-6">
+            <label for="latitude">Latitude</label>
+            <input
+              disabled
+              type="text"
+              class="form-control"
+              id="latitude"
+              v-model.trim="shop.latitude"
+            />
+          </div>
+          <div class="col-6">
+            <label for="longitude">Longitude</label>
+            <input
+              disabled
+              type="text"
+              class="form-control"
+              id="longitude"
+              v-model.trim="shop.longitude"
+            />
+          </div>
+        </div>
+        <MapLoader @selectPosition="setCoordinates" />
       </base-card>
       <!-- second column -->
-  
-      <base-card class="mt-2 col-lg-5 ">
+
+      <base-card class="mt-2 col-lg-5">
         <div class="fs-5 mb-2 fw-bold">Owner Info</div>
         <div class="row">
           <div
-            class="mb-3 col-md-6"
+            class="mb-2 col-md-6"
             :class="{ warining: v$.shop.first_name.$error }"
           >
             <label for="first_name" class="form-label">First name</label>
@@ -169,7 +192,7 @@
             >
           </div>
           <div
-            class="mb-3 col-md-6"
+            class="mb-2 col-md-6"
             :class="{ warining: v$.shop.last_name.$error }"
           >
             <label for="last_name" class="form-label">Last name</label>
@@ -190,7 +213,7 @@
           </div>
         </div>
 
-        <div class="mb-3" :class="{ warining: v$.shop.email.$error }">
+        <div class="mb-2" :class="{ warining: v$.shop.email.$error }">
           <label for="email" class="form-label">Email</label>
           <input
             type="text"
@@ -207,7 +230,7 @@
             {{ error.$message + ", " }}</span
           >
         </div>
-        <div class="mb-3" :class="{ warining: v$.shop.phone_number1.$error }">
+        <div class="mb-2" :class="{ warining: v$.shop.phone_number1.$error }">
           <label for="phone_number1" class="form-label">Phone No I</label>
           <input
             type="text"
@@ -224,7 +247,7 @@
             {{ error.$message + ", " }}</span
           >
         </div>
-        <div class="mb-3">
+        <div class="mb-2">
           <label for="phone_numbers2" class="form-label">Phone No II</label>
           <input
             type="text"
@@ -233,7 +256,7 @@
             v-model.trim="shop.phone_number2"
           />
         </div>
-        <div class="mb-3">
+        <div class="mb-2">
           <label for="manager_region" class="form-label">Region</label>
           <input
             type="text"
@@ -242,7 +265,7 @@
             v-model.trim="shop.manager_region"
           />
         </div>
-        <div class="mb-3">
+        <div class="mb-2">
           <label for="manager_zone" class="form-label">Zone</label>
           <input
             type="text"
@@ -251,7 +274,7 @@
             v-model.trim="shop.manager_zone"
           />
         </div>
-        <div class="mb-3">
+        <div class="mb-2">
           <label for="manager_woreda" class="form-label">Woreda</label>
           <input
             type="text"
@@ -260,7 +283,7 @@
             v-model.trim="shop.manager_woreda"
           />
         </div>
-        <div class="mb-3">
+        <div class="mb-2">
           <label for="manager_city" class="form-label">City</label>
           <input
             type="text"
@@ -269,7 +292,7 @@
             v-model.trim="shop.manager_city"
           />
         </div>
-        <div class="mb-3">
+        <div class="mb-2">
           <label for="kebele" class="form-label">Kebele</label>
           <input
             type="text"
@@ -278,14 +301,13 @@
             v-model.trim="shop.manager_kebele"
           />
         </div>
-     </base-card>   
+      </base-card>
       <base-button
         class="mt-3 me-3"
         title="Save"
         :isLoading="isLoading"
         @submit="addNewShop"
       />
-      
     </form>
   </div>
 
@@ -306,7 +328,11 @@ import {
   email,
 } from "@vuelidate/validators";
 import apiClient from "../resources/baseUrl";
+import MapLoader from "../components/MapLoader.vue";
 export default {
+  components: {
+    MapLoader,
+  },
   data() {
     return {
       v$: useValidate(),
@@ -316,8 +342,8 @@ export default {
         zone: "",
         city: "",
         house_no: "",
-        latitude: "37",
-        longitude: "11",
+        latitude: " ",
+        longitude: " ",
         woreda: "",
         kebele: "",
         is_active: "1",
@@ -354,6 +380,10 @@ export default {
       this.isAlertVisible = true;
       this.alertMessage = message;
       this.isRequestSucceed = isRequestSucceed;
+    },
+    setCoordinates(position){
+       this.shop.latitude= position.lat;
+       this.shop.longitude= position.lng
     },
     async addNewShop() {
       this.v$.$validate();

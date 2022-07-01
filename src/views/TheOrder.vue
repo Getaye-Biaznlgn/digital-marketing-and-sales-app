@@ -80,19 +80,8 @@
           ><i class="fas fa-search"></i
         ></span>
       </div>
-      <div class="d-flex">
-        <div class="pe-2">
-          <select class="form-select" aria-label="selectFilte">
-            <option value=" ">Sort</option>
-            <option>Sort</option>
-          </select>
-        </div>
-        <div>
-          <select class="form-select" aria-label="selectFilterRegion">
-            <option value=" ">Sort</option>
-            <option>Sort</option>
-          </select>
-        </div>
+      <div>
+        <button @click="downloadCSV()" class="btn border">Export</button>
       </div>
     </div>
     <!-- Table -->
@@ -136,7 +125,7 @@
       </tr>
     </table>
   </div>
-          <div v-if="!orders.length" class="mt-2 text-center">No record</div>
+  <div v-if="!orders.length" class="mt-2 text-center">No record</div>
 
   <!-- pagination -->
   <div v-if="!isSearch" class="d-flex justify-content-end mb-3 me-2">
@@ -240,7 +229,7 @@
 import apiClient from "../resources/baseUrl";
 import useValidate from "@vuelidate/core";
 import Paginate from "vuejs-paginate-next";
-
+import exportFromJSON from "export-from-json";
 import { required, helpers } from "@vuelidate/validators";
 export default {
   components: {
@@ -276,6 +265,12 @@ export default {
     };
   },
   methods: {
+    downloadCSV() {
+      const data = this.orders;
+      const fileName = "orders";
+      const exportType = exportFromJSON.types.csv;
+      if (data) exportFromJSON({ data, fileName, exportType });
+    },
     dismissAlert() {
       this.timeout = setTimeout(() => {
         this.isAlertVisible = false;
@@ -423,9 +418,9 @@ export default {
         this.$store.commit("setIsLoading", false);
       }
     },
-    fetchByFilter(filter){
-      this.pageNo=1
-     this.fetchOrders(filter)
+    fetchByFilter(filter) {
+      this.pageNo = 1;
+      this.fetchOrders(filter);
     },
     //paginations
     fetchByPageNo(no) {

@@ -7,7 +7,7 @@
 
     <hr />
     <div class="d-flex p-2 selection-bar justify-content-between">
-     <div class="position-relative w-50 me-2">
+      <div class="position-relative w-50 me-2">
         <input
           type="text"
           v-model="searchQuery"
@@ -17,24 +17,16 @@
           aria-label="Recipient's username"
           aria-describedby="basic-add"
         />
-        <span  @click="searchAgent" role="button" class="position-absolute  end-0 top-0 p-2 me-2"
+        <span
+          @click="searchAgent"
+          role="button"
+          class="position-absolute end-0 top-0 p-2 me-2"
           ><i class="fas fa-search"></i
         ></span>
       </div>
 
-      <div class="d-flex">
-        <div class="pe-2">
-          <select class="form-select" aria-label="selectFilte">
-            <option value=" ">Sort</option>
-            <option>Sort</option>
-          </select>
-        </div>
-        <div>
-          <select class="form-select" aria-label="selectFilterRegion">
-            <option value=" ">Sort</option>
-            <option>Sort</option>
-          </select>
-        </div>
+      <div>
+        <button @click="downloadCSV()" class="btn border">Export</button>
       </div>
     </div>
     <!-- Table -->
@@ -55,9 +47,12 @@
         </td>
         <td>{{ agent.email }}</td>
         <td>
-          <span v-if="agent.phone_numbers[0]">{{ agent.phone_numbers[0] }}</span>
-          <span v-if="agent.phone_numbers[1]">{{'/'+ agent.phone_numbers[1] }}</span>
-          
+          <span v-if="agent.phone_numbers[0]">{{
+            agent.phone_numbers[0]
+          }}</span>
+          <span v-if="agent.phone_numbers[1]">{{
+            "/" + agent.phone_numbers[1]
+          }}</span>
         </td>
         <td class="text-capitalize">{{ agent.manager_region }}</td>
         <td class="text-capitalize">{{ agent.manager_city }}</td>
@@ -71,34 +66,34 @@
         </td>
       </tr>
     </table>
-            <div v-if="!agents.length" class="mt-2 text-center">No record</div>
+    <div v-if="!agents.length" class="mt-2 text-center">No record</div>
 
-      <!-- pagination -->
-  <div class="d-flex justify-content-end mt-2 mb-3 me-2">
-    <div class="me-3">
-      <select
-        @change="handlePerPage()"
-        v-model="perPage"
-        class="form-select"
-        aria-label="perPage"
+    <!-- pagination -->
+    <div class="d-flex justify-content-end mt-2 mb-3 me-2">
+      <div class="me-3">
+        <select
+          @change="handlePerPage()"
+          v-model="perPage"
+          class="form-select"
+          aria-label="perPage"
+        >
+          <option value="5">5</option>
+          <option value="10" selected>10</option>
+          <option value="25">25</option>
+          <option value="50">50</option>
+          <option value="100">100</option>
+        </select>
+      </div>
+
+      <paginate
+        :page-count="totalPage"
+        :click-handler="fetchByPageNo"
+        :prev-text="'Prev'"
+        :next-text="'Next'"
+        :container-class="'d-flex nav page-item'"
       >
-        <option value="5">5</option>
-        <option value="10" selected>10</option>
-        <option value="25">25</option>
-        <option value="50">50</option>
-        <option value="100">100</option>
-      </select>
+      </paginate>
     </div>
-
-    <paginate
-      :page-count="totalPage"
-      :click-handler="fetchByPageNo"
-      :prev-text="'Prev'"
-      :next-text="'Next'"
-      :container-class="'d-flex nav page-item'"
-    >
-    </paginate>
-  </div>
   </div>
   <!-- edit agents -->
   <base-modal
@@ -180,7 +175,7 @@
           {{ error.$message + ", " }}</span
         >
       </div>
-       <div class="mb-3">
+      <div class="mb-3">
         <label for="zone" class="form-label">Phone no 2</label>
         <input
           type="text"
@@ -270,10 +265,11 @@
 import apiClient from "../resources/baseUrl";
 import useValidate from "@vuelidate/core";
 import Paginate from "vuejs-paginate-next";
+import exportFromJSON from "export-from-json";
 import { required, helpers, email, maxLength } from "@vuelidate/validators";
 export default {
-  components:{
-     Paginate
+  components: {
+    Paginate,
   },
   data() {
     return {
@@ -281,7 +277,7 @@ export default {
       isEditModalVisible: false,
       // isDetailModalVisible: false,
       agentForDetail: {},
-      searchQuery:'',
+      searchQuery: "",
       alertMessage: "",
 
       isLoading: false,
@@ -290,14 +286,19 @@ export default {
       // alert
       isAlertVisible: false,
       timeout: "",
-     //paginate
+      //paginate
       perPage: 10,
       pageNo: 1,
-      totalPage: 0
-
+      totalPage: 0,
     };
   },
   methods: {
+    downloadCSV() {
+      const data = this.agents;
+      const fileName = "agents";
+      const exportType = exportFromJSON.types.csv;
+      if (data) exportFromJSON({ data, fileName, exportType });
+    },
     dismissAlert() {
       this.timeout = setTimeout(() => {
         this.isAlertVisible = false;
@@ -315,8 +316,8 @@ export default {
     // },
     showEditModal({ ...agent }) {
       this.agent = agent;
-      this.agent.phone_number1= agent.phone_numbers[0]
-      this.agent.phone_number2= agent.phone_numbers[1]
+      this.agent.phone_number1 = agent.phone_numbers[0];
+      this.agent.phone_number2 = agent.phone_numbers[1];
       this.isEditModalVisible = true;
     },
     closeAddModal() {
@@ -331,10 +332,10 @@ export default {
       this.v$.$validate();
       if (!this.v$.$error) {
         this.isLoading = true;
-        this.agent.phone_numbers[0]=this.agent.phone_number1
-        this.agent.phone_numbers[1]=this.agent.phone_number2
-        delete this.agent.phone_number1
-        delete this.agent.phone_number2
+        this.agent.phone_numbers[0] = this.agent.phone_number1;
+        this.agent.phone_numbers[1] = this.agent.phone_number2;
+        delete this.agent.phone_number1;
+        delete this.agent.phone_number2;
         try {
           const response = await apiClient.put(
             `/api/managers/${this.agent.id}`,
@@ -377,7 +378,6 @@ export default {
     //     }
     //  },
 
-    
     // async deleteAgent() {
     //   this.isLoading = true;
     //   try {
@@ -402,10 +402,12 @@ export default {
     async fetchAgents() {
       try {
         this.$store.commit("setIsLoading", true);
-        const response = await apiClient.get(`/api/managers?search=${this.searchQuery}&&page=${this.pageNo}&&per_page=${this.perPage}`);
+        const response = await apiClient.get(
+          `/api/managers?search=${this.searchQuery}&&page=${this.pageNo}&&per_page=${this.perPage}`
+        );
         if (response.status === 200) {
           this.agents = response.data.data;
-         this.perPage = response.data.meta.per_page;
+          this.perPage = response.data.meta.per_page;
           this.pageNo = response.data.meta.current_page;
           this.totalPage = response.data.meta.last_page;
         }
@@ -415,17 +417,17 @@ export default {
         this.$store.commit("setIsLoading", false);
       }
     },
-    searchAgent(){
-      this.pageNo=1
-      this.fetchAgents()
+    searchAgent() {
+      this.pageNo = 1;
+      this.fetchAgents();
     },
-     //paginations
+    //paginations
     fetchByPageNo(no) {
       this.pageNo = no;
       this.fetchAgents(this.filterString);
     },
     handlePerPage() {
-      this.pageNo=1
+      this.pageNo = 1;
       this.fetchAgents(this.filterString);
     },
   },

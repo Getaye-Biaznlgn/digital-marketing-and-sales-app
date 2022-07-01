@@ -86,7 +86,7 @@
               <tr v-for="(order, index) in orders" :key="order.id">
                 <td>{{ index + 1 }}</td>
                 <td>{{ order.order_ref }}</td>
-                <td>{{ order.first_name + " " + order.last_name }}</td>
+                <td class="text-capitalize">{{ order.first_name + " " + order.last_name }}</td>
                 <td>
                   {{
                     new Date(order.order_date)
@@ -96,8 +96,8 @@
                       .join(" ")
                   }}
                 </td>
-                <td>{{ order.shop_name }}</td>
-                <td>{{ order.order_status }}</td>
+                <td class="text-capitalize">{{ order.shop_name }}</td>
+                <td class="text-capitalize">{{ order.order_status }}</td>
               </tr>
             </table>
             <div v-if="!orders.length" class="text-center">No Resent Order</div>

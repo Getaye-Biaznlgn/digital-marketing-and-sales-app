@@ -28,19 +28,8 @@
         ></span>
       </div>
 
-      <div class="d-flex">
-        <div class="pe-2">
-          <select class="form-select" aria-label="selectFilte">
-            <option value=" ">Sort</option>
-            <option>Sort</option>
-          </select>
-        </div>
-        <div>
-          <select class="form-select" aria-label="selectFilteruser_region">
-            <option value=" ">Sort</option>
-            <option>Sort</option>
-          </select>
-        </div>
+     <div>
+        <button @click="downloadCSV()" class="btn border">Export</button>
       </div>
     </div>
     <!-- Table -->
@@ -335,6 +324,7 @@ import {
   maxLength,
   numeric,
 } from "@vuelidate/validators";
+import exportFromJSON from "export-from-json"
 export default {
   components:{
     Paginate
@@ -376,6 +366,12 @@ export default {
     };
   },
   methods: {
+     downloadCSV(){
+        const data = this.customers;
+      const fileName = "customers";
+      const exportType = exportFromJSON.types.csv;
+      if (data) exportFromJSON({ data, fileName, exportType });
+    },
     dismissAlert() {
       this.timeout = setTimeout(() => {
         this.isAlertVisible = false;

@@ -69,19 +69,8 @@
           ><i class="fas fa-search"></i
         ></span>
       </div>
-      <div class="d-flex">
-        <div class="pe-2">
-          <select class="form-select" aria-label="selectFilte">
-            <option value=" ">Sort</option>
-            <option>Sort</option>
-          </select>
-        </div>
-        <div>
-          <select class="form-select" aria-label="selectFilterRegion">
-            <option value=" ">Sort</option>
-            <option>Sort</option>
-          </select>
-        </div>
+      <div>
+        <button @click="downloadCSV()" class="btn border">Export</button>
       </div>
     </div>
     <!-- Table -->
@@ -106,10 +95,16 @@
           <span>{{ shop.first_name + " " + shop.last_name }}</span>
         </td>
         <td>{{ shop.shop_status ? "Active" : "Inactive" }}</td>
-        <td style="white-space:nowrap;">
-          <span class="me-2" @click="$router.push({
-            name: 'UpdateShop', params:{id:shop.id}
-          })" role="button"
+        <td style="white-space: nowrap">
+          <span
+            class="me-2"
+            @click="
+              $router.push({
+                name: 'UpdateShop',
+                params: { id: shop.id },
+              })
+            "
+            role="button"
             ><i class="far fa-edit"></i
           ></span>
           <span class="me-2" @click="showDeleteModal(shop)" role="button"
@@ -190,6 +185,7 @@
 import apiClient from "../resources/baseUrl";
 import Paginate from "vuejs-paginate-next";
 import useValidate from "@vuelidate/core";
+import exportFromJSON from "export-from-json"
 // import { required, helpers, maxLength } from "@vuelidate/validators";
 export default {
   components: {
@@ -221,6 +217,12 @@ export default {
     };
   },
   methods: {
+     downloadCSV(){
+        const data = this.shops;
+      const fileName = "shops";
+      const exportType = exportFromJSON.types.csv;
+      if (data) exportFromJSON({ data, fileName, exportType });
+    },
     resetFieldEmpity() {
       (this.shop.name = ""), (this.shop.code = "");
     },
@@ -253,7 +255,7 @@ export default {
     //           is_active: this.$refs.shopStatus.checked,
     //           ...this.shop
     //         }
-            
+
     //       );
     //       if (response.status === 200) {
     //         const editedIndex = this.shops.findIndex((shop) => {

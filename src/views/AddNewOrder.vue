@@ -1,6 +1,6 @@
 <template>
   <DetailPage title="Add New Order">
-    difficult to understand  
+    intentionally left blank  
   </DetailPage>>
 </template>
 
