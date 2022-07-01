@@ -23,7 +23,10 @@
         <td>{{category.title}}</td>
         <td>{{category.description.slice(0,50)}}...</td>
         <td>
-          <span class="me-2" @click="showEditModal(category)" role="button"
+          <span class="me-2" @click="showDetailModal(category)" role="button"
+            ><i class="far fa-eye"></i
+          ></span>
+          <span class="me-2" @click="$router.push({name:'CategoryDetail', params:{id:category.id} })" role="button"
             ><i class="far fa-edit"></i
           ></span>
           <span  @click="showDeleteModal(category)" role="button"
@@ -34,7 +37,7 @@
     </table>
 </div>
     <!-- add categories -->
-<base-modal :modalState="isAddModalVisible" title="Category" @close="closeAddModal" btnLabel="Save" 
+<base-modal :modalState="isAddModalVisible" title="Category" @close="closeAddModal" :btnLabel="forDetail?'OK' :'Save'" 
   :isLoading="isLoading" @submit="addNewCategory">
      <form @submit.prevent>
       <div class="mb-3" :class="{ warining: v$.category.title.$error }">
@@ -42,6 +45,7 @@
         <input
           type="text"
           class="form-control"
+          :disabled="forDetail"
           id="title"
           v-model.trim="category.title"
           @blur="v$.category.title.$touch"
@@ -61,6 +65,7 @@
         rows="5"
           class="form-control"
           id="description"
+          :disabled="forDetail"
           v-model.trim="category.description"
           @blur="v$.category.description.$touch"
         />
@@ -113,9 +118,9 @@ export default {
             // alert
             isAlertVisible:false,
             timeout: '',
-            // to use add modal as edit depend on the condition and #forUpdate to 
+            // to use add modal as edit depend on the condition and #forDetail to 
             //chage the action which should be performed 
-            forUpdate:false,
+            forDetail:false,
         }
     },
     methods:{
@@ -135,8 +140,8 @@ export default {
      closeDeleteModal(){
        this.isDeleteModalVisible=false
      },
-     showEditModal({...catagory}){
-       this.forUpdate=true;
+     showDetailModal({...catagory}){
+       this.forDetail=true;
         this.category=catagory
         this.isAddModalVisible=true
      },
@@ -148,34 +153,35 @@ export default {
          showAddModal(){
             this.isAddModalVisible=true
          },
-    async updateCategory(){
-      this.v$.$validate();
-      if (!this.v$.$error) {
-        this.isLoading = true;
-        try {
-          const response = await apiClient.put(`/api/categories/${this.category.id}`, this.category);
-          if (response.status === 200) {
-            const editedIndex = this.categories.findIndex((category) => {
-              return this.category.id === category.id;
-            });
-            this.categories[editedIndex] = response.data;
-            ///
-          } else throw "";
-        } catch (e) {
-           this.alertMessage="Faild to update category"
-           this.isAlertVisible=true
-           this.dismissAlert();
-        } finally {
-          this.isLoading = false;
-          this.closeAddModal();
-          this.forUpdate=false;
-        }
-      }
-         },
+    // async updateCategory(){
+    //   this.v$.$validate();
+    //   if (!this.v$.$error) {
+    //     this.isLoading = true;
+    //     try {
+    //       const response = await apiClient.put(`/api/categories/${this.category.id}`, this.category);
+    //       if (response.status === 200) {
+    //         const editedIndex = this.categories.findIndex((category) => {
+    //           return this.category.id === category.id;
+    //         });
+    //         this.categories[editedIndex] = response.data;
+    //         ///
+    //       } else throw "";
+    //     } catch (e) {
+    //        this.alertMessage="Faild to update category"
+    //        this.isAlertVisible=true
+    //        this.dismissAlert();
+    //     } finally {
+    //       this.isLoading = false;
+    //       this.closeAddModal();
+    //       this.forDetail=false;
+    //     }
+    //   }
+    //  },
+
      async addNewCategory(){
-      if(this.forUpdate){
-        this.updateCategory();
-        return;
+      if(this.forDetail){
+       return this.closeAddModal();
+        
       }
         
       this.v$.$validate();

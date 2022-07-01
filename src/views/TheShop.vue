@@ -97,7 +97,7 @@
         <th><span class="sr-only">Action</span></th>
       </tr>
       <tr v-for="(shop, index) in shops" :key="shop.id" class="text-capitalize">
-        <td>{{ index + 1 }}</td>
+        <td>{{ pageNo * perPage - perPage + index + 1 }}</td>
         <td>{{ shop.name }}</td>
         <td>{{ shop.region }}</td>
         <td>{{ shop.zone }}</td>
@@ -215,7 +215,7 @@ export default {
       //paginate
       perPage: 10,
       pageNo: 1,
-      totalPage: "",
+      totalPage: 0,
       //to make the pagination off on search result
       isSearch: false,
     };

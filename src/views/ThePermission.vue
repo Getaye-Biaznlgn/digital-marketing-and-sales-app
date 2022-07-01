@@ -4,9 +4,9 @@
       <span class="fs-5 fw-bold text-capitalize"
         >Role:{{ $route.query.role }}</span
       >
-      <BaseButton @submit="assignPermissions" title="Save Changes" />
+      <BaseButton :isLoading="isLoading" @submit="assignPermissions" title="Save Changes" />
     </div>
-    <form @submit.prevent>
+    <form @submit.prevent class="mx-2">
       <div class="d-inline">
         <div
           class="form-check"
@@ -27,6 +27,12 @@
       </div>
     </form>
   </DetailPage>
+   <!--  -->
+  <the-alert
+    :isVisible="isAlertVisible"
+    :message="alertMessage"
+    :isSucceed="isRequestSucceed"
+  />
 </template>
 
 <script>
@@ -40,6 +46,12 @@ export default {
         sendpermissions: [],
       },
       checkValues: [],
+      isLoading:false,
+      //
+      isAlertVisible: false,
+      isRequestSucceed:false,
+      alertMessage:'',
+      timeout: "",
     };
   },
 
@@ -69,9 +81,9 @@ export default {
           this.checkValues = res.data;
         }
       } catch (error) {
-        console.log("jj");
+        //
       } finally {
-        console.log("jj");
+        //
       }
     },
     async assignPermissions() {
@@ -80,20 +92,35 @@ export default {
       //            console.log(this.sendData)
 
       try {
+        this.isLoading= true
         const res = await apiClient.post(
           "api/assign_permission/" + this.$route.params.id,
           { permissions: this.checkValues }
         );
 
         if (res.status === 200) {
-          console.log("permission granted");
+           this.setAlertData(true, "Permission is changed successfuly");
         }
       } catch (error) {
-        console.log("jj");
+        this.setAlertData(false, "Faild to change permissions");
       } finally {
-        console.log("jj");
+        this.isLoading=false
+        this.dismissAlert()
       }
     },
+      dismissAlert() {
+      this.timeout = setTimeout(() => {
+        this.isAlertVisible = false;
+      }, 2000);
+    },
+     setAlertData(isRequestSucceed, message) {
+      this.isAlertVisible = true;
+      this.alertMessage = message;
+      this.isRequestSucceed = isRequestSucceed;
+    },
+  },
+  beforeUnmount(){
+    clearTimeout(this.timeout)
   },
   created() {
     this.getRolePermissions();

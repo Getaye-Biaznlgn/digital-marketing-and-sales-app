@@ -42,7 +42,7 @@
 </template>
 
 <script>
-import apiClient from "../resources/baseUrl";
+// import apiClient from "../resources/baseUrl";
 export default {
   props: ["roleModal"],
   data() {
@@ -52,18 +52,7 @@ export default {
     };
   },
   methods: {
-    async saveRole() {
-      try {
-        const res = await apiClient.post("api/roles", { name: this.role });
-        if (res.status === 201) {
-          console.log("saved");
-          this.successMessage = "Role Added Successfully";
-          this.roleModal.hide();
-        }
-      } catch (error) {
-        this.successMessage = "error while saving";
-      }
-    },
+  
   },
 };
 </script>

@@ -94,9 +94,9 @@
       </div>
       <div class="d-flex">
         <div class="pe-2">
-          <select class="form-select" aria-label="selectFilte">
-            <option value=" ">Sort</option>
-            <option>Sort</option>
+          <select class="form-select" v-model="selectedCategory" @change="fetchProducts(filterString)" aria-label="selectFilte">
+            <option value="all">All</option>
+            <option v-for="category in categories" :key="category.id"  :value="category.id">{{category.title}}</option>
           </select>
         </div>
         <div>
@@ -222,7 +222,7 @@ import apiClient from "../resources/baseUrl";
 import Paginate from "vuejs-paginate-next";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
-import { ref, onBeforeUnmount } from "vue";
+import { ref, onBeforeUnmount, computed } from "vue";
 export default {
   components: { Paginate },
   setup() {
@@ -233,13 +233,16 @@ export default {
     // const products = computed(() => store.getters.products);
     var isLoading = ref(false);
     var productForDelete = ref();
+    var selectedCategory =ref('all');
     var isAlertVisible = ref(false);
     var timeout = ref(false);
     var searchValue = ref("");
-    var filterString = ref("all");
+    //paginate
+    var filterString = ref("");
     var perPage = ref(10);
     var pageNo = ref(1);
-    var totalPage = ref();
+    var totalPage = ref(0);
+
     // var filteredProduct = computed(() => {
     //   if (searchValue.value == "") {
     //     return products.value;
@@ -248,7 +251,7 @@ export default {
     //     product.name.toLowerCase().includes(searchValue.value.toLowerCase())
     //   );
     // });
-    
+    const categories= computed(()=>store.getters.categories) 
     const searchProduct = async function (searchQuery) {
        try {
         store.commit("setIsLoading", true);
@@ -258,9 +261,10 @@ export default {
         if (response.status === 200) {
           products.value = response.data.data;
           filterString.value = '';
-          perPage.value = response.data.meta.per_page;
-          pageNo.value = response.data.meta.current_page;
-          totalPage.value = response.data.meta.last_page;
+          
+          // perPage.value = response.data.meta.per_page;
+          // pageNo.value = response.data.meta.current_page;
+          // totalPage.value = response.data.meta.last_page;
         }
       } catch (e) {
         //
@@ -284,9 +288,16 @@ export default {
       try {
         store.commit("setIsLoading", true);
         searchValue.value=''
-        const response = await apiClient.get(
+        let response;
+        if(selectedCategory.value==='all')
+       response = await apiClient.get(
           `/api/products?filter=${query}&&page=${pageNo.value}&&per_page=${perPage.value}`
         );
+        else
+         response = await apiClient.get(
+          `/api/products?filter=${query}&&page=${pageNo.value}&&per_page=${perPage.value}&&category=${selectedCategory.value}`
+        );
+
         if (response.status === 200) {
           products.value = response.data.data;
           filterString.value = query;
@@ -340,6 +351,7 @@ export default {
     onBeforeUnmount(function () {
       clearTimeout(timeout);
     });
+  
     // store.dispatch("fetchProducts");
     fetchProducts("all");
     return {
@@ -352,7 +364,9 @@ export default {
       handlePerPage,
       searchProduct,
       fetchByFilter,
+      categories,
       isAlertVisible,
+      selectedCategory,
       isDeleteModalVisible,
       productForDelete,
       products,

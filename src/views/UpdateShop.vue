@@ -226,7 +226,7 @@ export default {
           `/api/shop_translations/${this.$route.params.id}?language=${this.selectedLang}`
         );
         if (response.status === 200) {
-
+    
             this.shop = response.data.data;
         }
       } catch (e) {

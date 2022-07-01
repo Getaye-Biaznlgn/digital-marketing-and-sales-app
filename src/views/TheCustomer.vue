@@ -115,7 +115,7 @@
         </td>
       </tr>
     </table>
-            <div v-if="!customers.length" class="mt-2 text-center">No record</div>
+  <div v-if="!customers.length" class="mt-2 text-center">No record</div>
 
       <!-- pagination -->
   <div class="d-flex justify-content-end mt-2 mb-3 me-2">

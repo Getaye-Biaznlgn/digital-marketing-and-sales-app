@@ -18,16 +18,9 @@
           <td>{{ product.name }}</td>
           <td>{{ product.qty }}</td>
           <td>{{ product.qty > 0 ? "Instock" : "OutStock" }}</td>
-          <td class="d-flex">
-            <span class="me-2" @click="showEditModal(product)" role="button"
-              ><i class="far fa-edit"></i
-            ></span>
-            <!-- <span class="me-2" @click="showDeleteModal(product)" role="button"
-              ><i class="fas fa-trash"></i
-            ></span> -->
-          </td>
         </tr>
       </table>
+      <!-- <div v-if="!shopProducts.length" class="text-center">No record</div> -->
 </template>
 
 <script>
@@ -40,7 +33,3 @@ export default {
   
 }
 </script>
-
-<style>
-
-</style>

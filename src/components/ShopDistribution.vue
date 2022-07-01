@@ -23,12 +23,12 @@
       <td>{{ product.qty }}</td>
       <td>{{ product.status }}</td>
       <td class="d-flex">
-        <span class="me-2" @click="showEditModal(product)" role="button"
+        <!-- <span class="me-2" @click="showEditModal(product)" role="button"
           ><i class="far fa-edit"></i
-        ></span>
-        <!-- <span class="me-2" @click="showDeleteModal(product)" role="button"
+        ></span> -->
+        <span class="me-2" @click="showDeleteModal(product)" role="button"
               ><i class="fas fa-trash"></i
-            ></span> -->
+            ></span>
       </td>
     </tr>
   </table>
@@ -155,6 +155,9 @@ export default {
           this.selectedProductQty[index].qty = event.target.value;
         }
       }
+    },
+    showDeleteModal(){
+
     },
     showSendModal() {
       this.isSendProductModalVisible = true;

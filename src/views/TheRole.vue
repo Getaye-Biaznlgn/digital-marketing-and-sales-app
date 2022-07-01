@@ -5,6 +5,9 @@
       In the role section, you will review and manage all roles with their
       permissions. You can view and edit role.
     </p>
+    <div>
+      <BaseButton @click="showModal" title="Add Role" />
+    </div>
 
     <table>
       <tr>
@@ -20,79 +23,151 @@
           <button
             class="btn"
             @click="
-              $router.push({ name: 'ThePermission', params: { id: role.id } , query:{role:role.name}})
+              $router.push({
+                name: 'ThePermission',
+                params: { id: role.id },
+                query: { role: role.name },
+              })
             "
           >
             Permissions
           </button>
         </td>
         <td>
-          <span role="button"
-            ><i class="fas fa-trash"></i
-          ></span>
+          <span @click="showDeleteModal(role)" role="button"><i class="fas fa-trash"></i></span>
         </td>
       </tr>
     </table>
   </div>
-  
-  <add-modal id="roleModal" />
+  <!-- delete base modal -->
+  <base-modal
+    :modalState="isAddModalVisible"
+    btnLabel="Save"
+    :isLoading="isLoading"
+    title="Add Role"
+    @close="closeAddModal"
+    @submit="saveRole"
+  >
+    <div class="">
+      <label for="roleName">Name</label>
+      <input
+        v-model="role.name"
+        type="text"
+        name=""
+        id="roleName"
+        class="form-control"
+      />
+    </div>
+  </base-modal>
+  <!-- delete base modal -->
+  <base-modal
+    :modalState="isDeleteModalVisible"
+    btnLabel="Delete"
+    :isLoading="isLoading"
+    title="Delete"
+    @close="closeDeleteModal"
+    @submit="deleteRole"
+  >
+    <p>
+      Do u want to delete? <br />
+      {{ role?.name }}
+    </p>
+  </base-modal>
 </template>
 
 <script>
-import { Modal } from "bootstrap";
-import AddModal from "../components/AddRole.vue";
-import ApiClient from "../resources/baseUrl";
+import apiClient from "../resources/baseUrl";
 export default {
-  components: {
-    AddModal,
-  },
   data() {
     return {
-      roles: "",
+      roles: [],
+      role: { name: "" },
+      isDeleteModalVisible: false,
+      isAddModalVisible: false,
+      isLoading: false,
+      //
     };
   },
 
   methods: {
+    showModal() {
+      this.isAddModalVisible = true;
+    },
+    showDeleteModal(role) {
+      this.isDeleteModalVisible = true;
+      this.role= role;
+    },
+    closeAddModal() {
+      this.isAddModalVisible = false;
+      this.role = {};
+    },
+    closeDeleteModal() {
+      this.isDeleteModalVisible = false;
+      this.role={}
+    },
+   async deleteRole() {
+       try {
+        this.isLoading = true;
+        const res = await apiClient.delete("api/roles/"+this.role.id);
+        if (res.status === 200) {
+            const deletedIndex = this.roles.findIndex((role) => {
+            return role.id === this.role.id;
+          });
+          this.roles.splice(deletedIndex, 1);
+        }
+      } catch (error) {
+        //
+      } finally {
+        this.isLoading = false;
+        this.closeDeleteModal();
+      }
+    },
+    async saveRole() {
+      try {
+        this.isLoading = true;
+        const res = await apiClient.post("api/roles", this.role);
+        if (res.status === 201) {
+          this.roles.unshift(res.data);
+        }
+      } catch (error) {
+        //
+      } finally {
+        this.isLoading = false;
+        this.closeAddModal();
+      }
+    },
     async getAllRoles() {
       try {
         this.$store.commit("setIsLoading", true);
-        const res = await ApiClient.get("api/roles");
-
+        const res = await apiClient.get("api/roles");
         if (res.status === 200) {
           this.roles = res.data;
-          console.log("allroles==" + res.data);
         }
       } catch (error) {
-        console.log("jj");
+        //
       } finally {
-        console.log("jj");
+        //
         this.$store.commit("setIsLoading", false);
       }
     },
 
-    async getRolePermissions() {
-      try {
-        const res = await ApiClient.get("api/roles/");
+    // async getRolePermissions() {
+    //   try {
+    //     const res = await apiClient.get("api/roles/");
 
-        if (res.status === 200) {
-          this.roles = res.data;
-        }
-      } catch (error) {
-        console.log("jj");
-      } finally {
-        console.log("jj");
-      }
-    },
-    getModal() {
-      this.roleModal.show();
-    },
+    //     if (res.status === 200) {
+    //       this.roles = res.data;
+    //     }
+    //   } catch (error) {
+    //     //
+    //   } finally {
+    //     //
+    //   }
+    // },
+    
   },
   created() {
     this.getAllRoles();
-  },
-  mounted() {
-    // this.getAllRoles();
-    this.roleModal = new Modal(document.getElementById("roleModal"));
   },
 };
 </script>

@@ -44,7 +44,7 @@
         @click="selectedComponent='ShopDistribution'"
        :class="{'btn-bg-primary text-light':selectedComponent=='ShopDistribution'}"
         class="btn border">
-        Send Product
+        Product for approval
       </button>
       <hr />
       <keep-alive>

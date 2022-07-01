@@ -293,7 +293,7 @@ export default {
      //paginate
       perPage: 10,
       pageNo: 1,
-      totalPage: "",
+      totalPage: 0
 
     };
   },

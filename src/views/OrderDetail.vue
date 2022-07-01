@@ -16,16 +16,18 @@
             <div>
               <span
                 ><span class="fw-bold">Region:</span
-                >{{ " " + order.region }}</span
+                ><span v-if="order.region">{{ " " + order.region }}</span> </span
               >
             </div>
             <div class="d-flex justify-content-between">
               <span
-                ><span class="fw-bold">Zone:</span>{{ " " + order.zone }}</span
+                ><span class="fw-bold">Zone:</span>
+                <span v-if="order.woreda">{{ " " + order.zone }}</span>
+                </span
               >
               <span
                 ><span class="fw-bold">Woreda:</span
-                >{{ " " + order.woreda }}</span
+                ><span v-if="order.woreda">{{ " " + order.woreda }}</span> </span
               >
             </div>
           </div>

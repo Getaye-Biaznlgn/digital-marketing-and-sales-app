@@ -119,7 +119,7 @@ const store = useStore();
 const fetchOrders = async function () {
   try {
     store.commit("setIsLoading", true);
-    const response = await apiClient.get(`/api/all_orders`);
+    const response = await apiClient.get(`/api/all_orders?per_page=5`);
     if (response.status === 200) {
       orders.value = response.data.data;
     }

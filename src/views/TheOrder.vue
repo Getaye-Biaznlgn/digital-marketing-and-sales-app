@@ -218,7 +218,7 @@
     :modalState="isDeleteModalVisible"
     btnLabel="Delete"
     :isLoading="isLoading"
-    title="Delete Image"
+    title="Delete"
     @close="closeDeleteModal"
     @submit="deleteOrder"
   >
@@ -228,7 +228,7 @@
     </p>
   </base-modal>
 
-  <!--to show delete image is failed  -->
+  <!--  -->
   <the-alert
     :isVisible="isAlertVisible"
     :message="alertMessage"
@@ -270,7 +270,7 @@ export default {
       //paginate
       perPage: 10,
       pageNo: 1,
-      totalPage: "",
+      totalPage: 0,
       //to make the pagination off on search result
       isSearch: false,
     };
@@ -386,7 +386,6 @@ export default {
         this.fetchOrders("all");
         return;
       }
-
       try {
         this.$store.commit("setIsLoading", true);
         const response = await apiClient.post(
