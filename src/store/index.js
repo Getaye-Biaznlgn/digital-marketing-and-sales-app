@@ -5,7 +5,7 @@ export default createStore({
   state: {
     isLoading: false,
     categories: [],
-    products: []
+    products: [],
   },
   getters: {
     isLoading(state) {

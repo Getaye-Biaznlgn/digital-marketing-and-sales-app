@@ -11,16 +11,24 @@ export default {
   props: {
     labels: {
       required: false,
-      default: ["Monday", "Tuesday", "Sunday","Wednesday",'Friday','Saturday','Thursdary'],
+      default: [
+        "Monday",
+        "Tuesday",
+        "Sunday",
+        "Wednesday",
+        "Friday",
+        "Saturday",
+        "Thursdary",
+      ],
     },
     data: {
       required: false,
-      default: [10000, 12090, 15090,23444,23421,13312,12314],
+      default: [100, 100, 100, 100, 100, 100, 100],
     },
   },
   data() {
     return {
-      planetChartData: {
+      salesChartData: {
         type: "bar",
         data: {
           labels: this.labels,
@@ -49,12 +57,29 @@ export default {
           },
         },
       },
+      salesChart:null
     };
   },
+  methods: {
+    drawGraph() {
+      if(this.salesChart)
+         this.salesChart.destroy()
+      const ctx = document.getElementById("barChart").getContext("2d");
+      Chart.defaults.color = "#f1f1f1";
+     this.salesChart= new Chart(ctx, this.salesChartData);
+    },
+  },
   mounted() {
-    const ctx = document.getElementById("barChart").getContext("2d");
-    Chart.defaults.color = "#f1f1f1";
-    new Chart(ctx, this.planetChartData);
+    this.drawGraph();
+  },
+  watch: {
+    labels(values) {
+      this.salesChartData.data.labels = values;
+    },
+    data(values) {
+      this.salesChartData.data.datasets[0].data = values;
+      this.drawGraph()
+    },
   },
 };
 </script>

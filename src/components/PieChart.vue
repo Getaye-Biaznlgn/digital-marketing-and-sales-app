@@ -20,7 +20,7 @@ export default {
   },
   data() {
     return {
-      planetChartData: {
+      salesChartData: {
         type: "pie",
         data: {
           labels: this.labels,
@@ -33,7 +33,7 @@ export default {
           ],
         },
         //
-      options: {
+        options: {
           plugins: {
             title: {
               // display: false,
@@ -50,13 +50,33 @@ export default {
           },
         },
       },
+      salesChart:null
     };
   },
+  // mounted() {
+  //   const ctx = document.getElementById("pieChart").getContext("2d");
+  //   new Chart(ctx, this.salesChart);
+  //    Chart.defaults.color = "#f1f1f1";
+  // },
+  methods: {
+    drawGraph() {
+      if (this.salesChart) this.salesChart.destroy();
+      const ctx = document.getElementById("pieChart").getContext("2d");
+      Chart.defaults.color = "#f1f1f1";
+      this.salesChart = new Chart(ctx, this.salesChartData);
+    },
+  },
   mounted() {
-    const ctx = document.getElementById("pieChart").getContext("2d");
-    
-    new Chart(ctx, this.planetChartData);
-     Chart.defaults.color = "#f1f1f1";
+    this.drawGraph();
+  },
+  watch: {
+    labels(values) {
+      this.salesChartData.data.labels = values;
+    },
+    data(values) {
+      this.salesChartData.data.datasets[0].data = values;
+      this.drawGraph();
+    },
   },
 };
 </script>
