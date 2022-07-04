@@ -10,23 +10,23 @@
             <div class="flex-fill py-2 ms-1">Total Product</div>
             <div class="text-center" style="color: #82bc3e">
               <span><i class="fa fa-chart-line"></i></span>
-              <strong class="d-block"
-                >{{ marketStatistics.total_customer }}9</strong
-              >
+              <strong class="d-block">{{
+                marketStatistics.total_customer
+              }}</strong>
             </div>
           </div>
         </div>
         <div class="col-lg">
           <div class="bg-blue-black d-flex py-4 px-2">
-            <div class="py-2 icon text-center" style="backgroundColor: #ff7e00">
+            <div class="py-2 icon text-center" style="backgroundcolor: #ff7e00">
               <i class="fa-solid fa-cart-shopping fs-5 mt-1 align-middle"></i>
             </div>
             <div class="flex-fill py-2 ms-1">Total Order</div>
             <div class="text-center" style="color: #ff7e00">
               <span><i class="fa fa-chart-line"></i></span>
-              <strong class="d-block"
-                >{{ marketStatistics.total_order }}9</strong
-              >
+              <strong class="d-block">{{
+                marketStatistics.total_order
+              }}</strong>
             </div>
           </div>
         </div>
@@ -38,9 +38,9 @@
             <div class="flex-fill py-2 ms-1">Total Customer</div>
             <div class="text-center" style="color: #82bc3e">
               <span class="d-block"><i class="fa fa-chart-line"></i></span>
-              <strong class="d-block"
-                >{{ marketStatistics.total_product }}9</strong
-              >
+              <strong class="d-block">{{
+                marketStatistics.total_product
+              }}</strong>
             </div>
           </div>
         </div>

@@ -73,6 +73,14 @@
       >
       <i class="fas fa-layer-group"></i>
       </TheSidebarItem>
+      <TheSidebarItem
+        @click="setSelected('TheEmployee')"
+        :isSelected="selectedRoute == 'TheEmployee'"
+        label="Employee"
+        routeName="TheEmployee"
+      >
+      <i class="fas fa-user"></i>
+      </TheSidebarItem>
         <TheSidebarItem
       @click="setSelected('TheRole')"
         :isSelected="selectedRoute == 'TheRole'"
