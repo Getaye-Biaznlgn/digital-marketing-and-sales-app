@@ -3,44 +3,44 @@
     <div class="container overflow-hidden">
       <div class="row gx-5 gy-3">
         <div class="col-lg">
-          <div class="bg-blue-black d-flex py-4 px-3">
-            <div class="py-2 icon text-center">
+          <div class="bg-blue-black d-flex py-2 px-3">
+            <div class="py-2 mt-2 icon text-center">
               <i class="fas fa-layer-group fs-5 mt-1"></i>
             </div>
-            <div class="flex-fill py-2 ms-1">Total Product</div>
+            <div class="flex-fill py-2 mt-2 ms-1">Total Sales</div>
             <div class="text-center" style="color: #82bc3e">
               <span><i class="fa fa-chart-line"></i></span>
-              <strong class="d-block">{{
-                marketStatistics.total_customer
-              }}</strong>
+              <strong class="d-block">{{ marketStatistics.week }}</strong>
+              <span class="d-block small text-light">Last 7 days</span>
             </div>
           </div>
         </div>
         <div class="col-lg">
-          <div class="bg-blue-black d-flex py-4 px-2">
-            <div class="py-2 icon text-center" style="backgroundcolor: #ff7e00">
+          <div class="bg-blue-black d-flex py-2 px-2">
+            <div
+              class="py-2 mt-2 icon text-center"
+              style="backgroundcolor: #ff7e00"
+            >
               <i class="fa-solid fa-cart-shopping fs-5 mt-1 align-middle"></i>
             </div>
-            <div class="flex-fill py-2 ms-1">Total Order</div>
+            <div class="flex-fill py-2 mt-2 ms-1">Total Sales</div>
             <div class="text-center" style="color: #ff7e00">
               <span><i class="fa fa-chart-line"></i></span>
-              <strong class="d-block">{{
-                marketStatistics.total_order
-              }}</strong>
+              <strong class="d-block">{{ marketStatistics.month }}</strong>
+              <span class="d-block small text-light">Last 30 days</span>
             </div>
           </div>
         </div>
         <div class="col-lg">
-          <div class="bg-blue-black d-flex py-4 px-2">
-            <div class="py-2 icon text-center">
+          <div class="bg-blue-black d-flex py-2 px-2">
+            <div class="py-2 mt-2 icon text-center">
               <i class="fas fa-user-friends fs-5 align-middle"></i>
             </div>
-            <div class="flex-fill py-2 ms-1">Total Customer</div>
+            <div class="flex-fill mt-2 py-2 ms-1">Total Sales</div>
             <div class="text-center" style="color: #82bc3e">
               <span class="d-block"><i class="fa fa-chart-line"></i></span>
-              <strong class="d-block">{{
-                marketStatistics.total_product
-              }}</strong>
+              <strong class="d-block">{{ marketStatistics.year }}</strong>
+              <span class="d-block small text-light">Last 12 months</span>
             </div>
           </div>
         </div>
@@ -53,7 +53,7 @@
         <div class="col-lg-8">
           <div class="bg-blue-black py-4 px-2">
             <div class="d-flex mb-2 mx-2 justify-content-between">
-              <strong>Customer Analytics</strong>
+              <strong>Sales Analytics</strong>
               <div>
                 <select
                   @change="fetchCustomerStatistics()"
@@ -114,13 +114,13 @@
               <tr>
                 <th>No</th>
                 <th>Customer</th>
-                <th>Order Id</th>    
+                <th>Order Id</th>
                 <th>Order Date</th>
                 <th>Shop</th>
               </tr>
               <tr v-for="(order, index) in orders" :key="order.id">
                 <td>{{ index + 1 }}</td>
-                 <td class="text-capitalize">
+                <td class="text-capitalize">
                   {{ order.first_name + " " + order.last_name }}
                 </td>
                 <td>{{ order.order_ref }}</td>
@@ -145,6 +145,8 @@
 </template>
 
 <script setup>
+// all content is copied from dashboard and since the variables didn't update, it maynot give any sense. 
+// I want to say sorry for what was doing here
 import PieChart from "../components/PieChart.vue";
 import BarChart from "../components/BarChart.vue";
 import apiClient from "../resources/baseUrl";
@@ -219,16 +221,19 @@ const fetchSoldProductStatistics = async function () {
       let graphLables = [];
       let graphValues = [];
       const responseData = response.data;
-      // for(const attr in responseData){
-      //    graphLables.push(attr)
-      //    graphValues.push(responseData[attr])
-      // }
-      graphLables.push(responseData?.top1?.name);
-      graphLables.push(responseData?.top2?.name);
+
+      if (responseData?.top1) {
+        graphLables.push(responseData?.top1?.shop_name);
+        graphValues.push(responseData?.top1?.total_price);
+      }
+      if (responseData?.top2) {
+        graphLables.push(responseData?.top2?.shop_name);
+        graphValues.push(responseData?.top2?.total_price);
+      }
+
       graphLables.push("Other");
       //
-      graphValues.push(responseData?.top1?.product_count);
-      graphValues.push(responseData?.top2?.product_count);
+
       graphValues.push(responseData?.top3?.other);
       pieChartVales.value = graphValues;
       pieChartLables.value = graphLables;

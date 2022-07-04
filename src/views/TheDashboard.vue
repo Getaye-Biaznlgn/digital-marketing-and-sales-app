@@ -221,16 +221,17 @@ const fetchSoldProductStatistics = async function () {
       let graphLables = [];
       let graphValues = [];
       const responseData = response.data;
-      // for(const attr in responseData){
-      //    graphLables.push(attr)
-      //    graphValues.push(responseData[attr])
-      // }
-      graphLables.push(responseData?.top1?.name);
-      graphLables.push(responseData?.top2?.name);
-      graphLables.push("Other");
-      //
-      graphValues.push(responseData?.top1?.product_count);
-      graphValues.push(responseData?.top2?.product_count);
+      
+      if(responseData?.top1){
+       graphLables.push(responseData?.top1?.name);
+       graphValues.push(responseData?.top1?.product_count);
+      }
+      if(responseData?.top2){
+        graphLables.push(responseData?.top2?.name);
+        graphValues.push(responseData?.top2?.product_count);
+      }
+      graphLables.push("Other");      
+      
       graphValues.push(responseData?.top3?.other);
       pieChartVales.value = graphValues;
       pieChartLables.value = graphLables;
