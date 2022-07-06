@@ -12,8 +12,8 @@
       Add New employee
     </button>
     <hr />
-    <div class="d-flex p-2 justify-content-between selection-bar">
-      <div class="position-relative w-50 me-2">
+    <div class="d-flex p-2 justify-content-end selection-bar">
+      <!-- <div class="position-relative w-50 me-2">
         <input
           type="text"
           v-model="searchQuery"
@@ -29,7 +29,7 @@
           class="position-absolute end-0 top-0 p-2 me-2"
           ><i class="fas fa-search"></i
         ></span>
-      </div>
+      </div> -->
 
       <div>
         <button @click="downloadCSV()" class="btn border">Export</button>
@@ -117,7 +117,7 @@
     <div v-if="!employees.length" class="mt-2 text-center">No record</div>
 
     <!-- pagination -->
-    <div class="d-flex justify-content-end mt-2 mb-3 me-2">
+    <!-- <div class="d-flex justify-content-end mt-2 mb-3 me-2">
       <div class="me-3">
         <select
           @change="handlePerPage()"
@@ -141,7 +141,7 @@
         :container-class="'d-flex nav page-item'"
       >
       </paginate>
-    </div>
+    </div> -->
   </div>
 
   <!-- add employees -->
@@ -257,18 +257,18 @@
       <div>Choose employee status</div>
       <select
         id="changeStatus"
-        v-model="employeeForChangeStatus.employee_status"
+        v-model="employeeForChangeStatus.is_active"
         class="form-control"
       >
         <option
-          :disabled="employeeForChangeStatus.employee_status == 0"
+          :disabled="employeeForChangeStatus.is_active == 0"
           :value="0"
         >
           Inactive
         </option>
         <option
           :value="1"
-          :disabled="employeeForChangeStatus.employee_status == 1"
+          :disabled="employeeForChangeStatus.is_active == 1"
         >
           Active
         </option>
@@ -310,7 +310,7 @@
 <script>
 import apiClient from "../resources/baseUrl";
 import useValidate from "@vuelidate/core";
-import Paginate from "vuejs-paginate-next";
+// import Paginate from "vuejs-paginate-next";
 
 import {
   required,
@@ -321,9 +321,9 @@ import {
 } from "@vuelidate/validators";
 import exportFromJSON from "export-from-json";
 export default {
-  components: {
-    Paginate,
-  },
+  // components: {
+  //   Paginate,
+  // },
   data() {
     return {
       v$: useValidate(),
@@ -337,7 +337,8 @@ export default {
       employee: {
         first_name: "",
         last_name: "",
-        phone_number: "",
+        phone_number:" ",
+        type:"employee",
         email: "",
       },
       // alert
@@ -392,6 +393,7 @@ export default {
     showEditModal({ ...employee }) {
       this.forUpdate = true;
       this.employee = employee;
+      this.employee.phone_number= employee.phone_numbers?.[0]
       this.isAddModalVisible = true;
     },
     showChangeStatusModal({ ...employee }) {
@@ -435,7 +437,10 @@ export default {
             (employee) =>
               employee.id === this.employeeForChangeRole.id
           );
-          this.employees[index] =response.data
+          this.employees[index].role ={
+            id: this.employeeForChangeRole.roleId,
+            name: response.data
+          }
         } else throw "";
       } catch (e) {
         this.isAlertVisible = true;
@@ -443,29 +448,29 @@ export default {
         this.dismissAlert();
       } finally {
         this.isLoading = false;
-        this.closeChangeStatusModal();
+        this.closeChangeRoleModal();
       }   
     },
     async changeStatus() {
       this.isLoading = true;
       try {
         const response = await apiClient.post(
-          "/api/change_user_status/" + this.employeeForChangeStatus.employee_id,
-          { status: this.employeeForChangeStatus.employee_status }
+          "/api/change_system_user_status/" + this.employeeForChangeStatus.id,
+          { status: this.employeeForChangeStatus.is_active }
         );
         if (response.status === 200) {
           let index = this.employees.findIndex(
             (employee) =>
-              employee.employee_id === this.employeeForChangeStatus.employee_id
+              employee.id === this.employeeForChangeStatus.id
           );
-          this.employees[index].employee_status =
-            this.employeeForChangeStatus.employee_status;
+          this.employees[index].is_active =
+            this.employeeForChangeStatus.is_active;
             this.setAlertData(true, "User role is changed successully")
         } else throw "";
       } catch (e) {
         this.isAlertVisible = true;
         this.alertMessage = "Faild to change user status";
-        this.setAlertData(true, "Faild to change user role")
+        this.setAlertData(false, "Faild to change user role")
       } finally {
         this.isLoading = false;
         this.closeChangeStatusModal();
@@ -487,19 +492,23 @@ export default {
       }
     },
     async updateEmployee() {
+      
       this.v$.$validate();
       if (!this.v$.$error) {
         this.isLoading = true;
         try {
           const response = await apiClient.put(
-            `/api/users/${this.employee.employee_id}`,
-            this.employee
+            `/api/system_users/${this.employee.id}`,
+             
+              this.employee
+            
           );
           if (response.status === 200) {
             const editedIndex = this.employees.findIndex((employee) => {
               return this.employee.id === employee.id;
             });
-            this.employees[editedIndex] = this.employee;
+            this.employees[editedIndex] ={...this.employee} ;
+            this.employees[editedIndex].phone_numbers[0]=this.employee.phone_number
             this.setAlertData(true, "employee updated successfully");
             ///
           } else throw "";
@@ -524,8 +533,12 @@ export default {
         this.isLoading = true;
         try {
           const response = await apiClient.post(
-            "/api/employees",
-            this.employee
+            "/api/managers",
+            {
+              ...this.employee,
+              phone_numbers: [this.employee.phone_number]
+            }
+            
           );
           if (response.status === 201) {
             this.employees.push(response.data);
@@ -544,11 +557,11 @@ export default {
       this.isLoading = true;
       try {
         const response = await apiClient.delete(
-          `/api/users/${this.employeeForDelete.employee_id}`
+          `/api/system_users/${this.employeeForDelete.id}`
         );
         if (response.status === 200) {
           const deletedIndex = this.employees.findIndex((employee) => {
-            return employee.employee_id === this.employeeForDelete.employee_id;
+            return employee.id === this.employeeForDelete.id;
           });
           this.employees.splice(deletedIndex, 1);
         }

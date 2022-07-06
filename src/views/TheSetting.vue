@@ -10,7 +10,7 @@
     </div>
     <div class="border-bottom mb-3">
       <strong>Phone Number</strong>
-      <span class="ms-5">{{ user.phone_no }}</span>
+      <span class="ms-5">{{ user.phone_numbers[0].phone_number }}</span>
     </div>
     <BaseButton @submit="showChangePasswordModal" title="Change Password"/>
   </base-card>

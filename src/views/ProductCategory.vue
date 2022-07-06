@@ -21,8 +21,8 @@
         :key="category.id">
         <td>{{index+1}}</td>
         <td>{{category.title}}</td>
-        <td>{{category.description.slice(0,50)}}...</td>
-        <td>
+        <td>{{category.description?.slice(0,50)}}...</td>
+        <td style="white-space:nowrap;">
           <span class="me-2" @click="showDetailModal(category)" role="button"
             ><i class="far fa-eye"></i
           ></span>
@@ -77,6 +77,8 @@
           {{ error.$message + ", " }}</span
         >
       </div>
+                <multiple-image-upload v-if="!forDetail" @saveImage="setImages" />
+
      </form>
   </base-modal>
 
@@ -99,8 +101,12 @@
 <script>
 import apiClient from '../resources/baseUrl'
 import useValidate from "@vuelidate/core";
+import MultipleImageUpload from "../components/MultipleImageUpload.vue"
 import { required, helpers } from "@vuelidate/validators";
 export default {
+  components:{
+       MultipleImageUpload
+  },
     data(){
         return{
             v$:useValidate(),
@@ -115,15 +121,20 @@ export default {
                 title:'',
                 description:''
             },
+            image:"",
             // alert
             isAlertVisible:false,
             timeout: '',
             // to use add modal as edit depend on the condition and #forDetail to 
             //chage the action which should be performed 
             forDetail:false,
+
         }
     },
     methods:{
+      setImages(images){
+        this.image=images?.[0]
+      },
        dismissAlert() {
       this.timeout = setTimeout(() => {
         this.isAlertVisible = false;
@@ -187,8 +198,20 @@ export default {
       this.v$.$validate();
       if (!this.v$.$error) {
         this.isLoading = true;
+        var fd= new FormData()
+        fd.append(`image`, this.image);
+        for (const attr in this.category) {
+          fd.append(attr, this.category[attr]);
+        }
+        
         try {
-          const response = await apiClient.post("/api/categories", this.category);
+          const response = await apiClient.post("/api/categories", fd,{
+            headers: {
+              "Content-Type": "multipart/form-data",
+              Accept: "application/json",
+            },
+          });
+          
           if (response.status === 201) {
             this.categories.push(response.data);
           } else throw "";

@@ -482,7 +482,7 @@ export default {
       if (!this.v$.$error) {
         this.isLoading = true;
         try {
-          const response = await apiClient.post("/api/users", this.customer);
+          const response = await apiClient.post("/api/add_user_by_admin", this.customer);
           if (response.status === 201) {
             this.customers.push(response.data);
             this.setAlertData(true, "You have added customers successfully");
