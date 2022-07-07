@@ -1,7 +1,7 @@
 .DS_Store
 node_modules
 /dist
-/resources/google_map_api_key
+# resources/google_map_api_key
 
 # local env files
 .env.local
