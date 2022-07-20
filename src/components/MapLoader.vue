@@ -5,7 +5,7 @@
 <script setup>
 import { onMounted, ref, defineEmits, toRaw } from "vue";
 import { Loader } from "@googlemaps/js-api-loader";
-const GOOGLE_MAP_API_KEY = "AIzaSyBuMJ86uj9D-3vqFDgrD0vcdj39LZ-G1og";
+const GOOGLE_MAP_API_KEY = "";
 
 let clickListener = null;
 const loader = new Loader({ apiKey: GOOGLE_MAP_API_KEY });
