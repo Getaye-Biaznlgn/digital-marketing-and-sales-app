@@ -3,7 +3,7 @@
     <div class="fw-bold fs-5 ps-1 my-2">Menu</div>
     <ul class="navbar-nav pt-2 px-2">
       <TheSidebarItem
-        v-if="hasPermissionTo('add dashboard')"
+        v-if="hasPermissionTo('view dashboard')"
         @click="setSelected('TheDashboard')"
         :isSelected="selectedRoute == 'TheDashboard'"
         label="Dashboard"
