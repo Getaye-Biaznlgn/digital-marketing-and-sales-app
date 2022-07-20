@@ -28,13 +28,14 @@ export default {
       },
     },
     actions: {
-      async user(context) {
+      async fetchUser(context) {
         context.commit("setIsLoading", true);
         context.isLoading = true;
         try {
           var response = await apiClient.get("/api/user");
           if (response.status === 200) {
-            context.commit("setUser", response.data);
+            context.commit("setUser", response.data.user);
+            console.log('-user-data-', response.data.user);
           } else {
             throw "faild to load user";
           }

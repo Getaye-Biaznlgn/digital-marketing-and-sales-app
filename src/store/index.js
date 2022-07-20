@@ -37,7 +37,7 @@ export default createStore({
         var response = await apiClient.get("/api/categories");
         if (response.status === 200) {
           context.commit("setCategories", response.data);
-          console.log('categories', context.state.categories)
+          // console.log('categories', context.state.categories)
         } else {
           throw "faild to load categories";
         }
@@ -74,7 +74,6 @@ export default createStore({
         } else{
           throw 'faild to delete'
         }
-     
     }
   },
   modules: {

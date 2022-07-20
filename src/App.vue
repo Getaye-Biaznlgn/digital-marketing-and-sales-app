@@ -12,12 +12,15 @@ export default {
       this.$store.commit("setIsAuthenticated", true);
       apiClient.defaults.headers.common["Authorization"] = `Bearer ${token}`;
     }
-    if (localStorage.getItem("user")) {
-      let user = localStorage.getItem("user");
-      console.log("user", user);
-      this.$store.commit("setUser", JSON.parse(user));
-    }
+    // if (localStorage.getItem("user")) {
+    //   let user = localStorage.getItem("user");
+    //   // console.log("user", user);
+    //   this.$store.commit("setUser", JSON.parse(user));
+    // }
   },
+  created(){
+    this.$store.dispatch('fetchUser');
+  }
 }
 </script>
 

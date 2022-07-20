@@ -1,6 +1,9 @@
 <template>
   <div class="col-md-3 mx-auto border rounded-1 px-3 pt-3 mt-5">
-    <h4 class="mt-2 fw-bold text-center"><span class="brand-color1 me-1">RENSYS</span><span class="brand-color2">ENGINEERING</span></h4>
+    <h4 class="mt-2 fw-bold text-center">
+      <span class="brand-color1 me-1">RENSYS</span
+      ><span class="brand-color2">ENGINEERING</span>
+    </h4>
 
     <!-- loign form -->
     <form v-if="!isForgotSelected" class="pt-1" @submit.prevent="login">
@@ -181,7 +184,7 @@ export default {
             email: this.emailForForgot,
           });
           if (response.status == 200) {
-           // this.$router.push({name:'VerificationCode'});
+            // this.$router.push({name:'VerificationCode'});
 
             this.forgotSuccessMessage =
               "We have sent verfication link. Check your inbox please!";
@@ -218,6 +221,9 @@ export default {
 
             let toPath = this.$router.to || "/";
             this.$router.push(toPath);
+          } else if (response.status === 400) {
+            this.notify =
+              "Please verify your email, verification link has aleady been sent";
           } else {
             throw "faild" + response.status;
           }

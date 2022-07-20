@@ -24,8 +24,10 @@ import TheSidebar from "../components/TheSidebar.vue";
 import TheHeader from "../components/TheHeader.vue";
 import {useStore} from 'vuex'
 const store = useStore()
+store.dispatch('fetchUser')
 store.dispatch('fetchCategories');
 store.dispatch('fetchProducts')
+// store.dispatch('fetchUser')
 </script>
 
 <style>
