@@ -6,23 +6,19 @@
       customers.
     </div>
     <div class="d-flex justify-content-end">
-<!-- v-if="hasPermissionTo('add customer')" -->
-  <button
-      
-      @click="showSMSModal"
-      class="btn ms-auto me-3 border"
-    >
-      Send SMS Message
-    </button>
-    <button
-      v-if="hasPermissionTo('add customer')"
-      @click="showAddModal"
-      class="btn  btn-bg-primary text-light"
-    >
-      Add New Customer
-    </button>
+      <!-- v-if="hasPermissionTo('add customer')" -->
+      <button @click="showSMSModal" class="btn ms-auto me-3 border">
+        Broadcast SMS Message
+      </button>
+      <button
+        v-if="hasPermissionTo('add customer')"
+        @click="showAddModal"
+        class="btn btn-bg-primary text-light"
+      >
+        Add New Customer
+      </button>
     </div>
-  
+
     <hr />
     <div class="d-flex p-2 justify-content-between selection-bar">
       <div class="position-relative w-50 me-2">
@@ -327,22 +323,24 @@
     </div>
   </base-modal>
 
-<!-- mass sms base modal -->
+  <!-- mass sms base modal -->
   <base-modal
     :modalState="isMessageModalShown"
     btnLabel="Send"
     :isLoading="isLoading"
-    title="SMS message"
+    title="SMS Message"
     @close="closeMessageModal"
     @submit="sendMessage"
   >
-    <!-- <p>
-      Do u want to delete? <br />
-      <strong>{{
-        customerForDelete?.first_name + " " + customerForDelete?.last_name
-      }}</strong>
-    </p> -->
-    here we go 
+    <textarea
+      v-model="smsMessage"
+      class="form-control"
+      placeholder="Type SMS message..."
+      name="sms-txt"
+      id="smsTxt"
+      rows="5"
+    >
+    </textarea>
   </base-modal>
   <!--  -->
   <the-alert
@@ -357,14 +355,9 @@ import apiClient from "../resources/baseUrl";
 import useValidate from "@vuelidate/core";
 import Paginate from "vuejs-paginate-next";
 
-import {
-  required,
-  helpers,
-  email,
-  maxLength,
-} from "@vuelidate/validators";
+import { required, helpers, email, maxLength } from "@vuelidate/validators";
 import exportFromJSON from "export-from-json";
-const newLocal=this;
+const newLocal = this;
 export default {
   components: {
     Paginate,
@@ -374,11 +367,12 @@ export default {
       v$: useValidate(),
       isAddModalVisible: false,
       isDeleteModalVisible: false,
-      isMessageModalShown:false,
+      isMessageModalShown: false,
       customerForDelete: {},
       searchQuery: "",
       isLoading: false,
       customers: [],
+      smsMessage: "",
       customer: {
         first_name: "",
         last_name: "",
@@ -412,11 +406,33 @@ export default {
     },
   },
   methods: {
-    closeMessageModal(){
-      this.isMessageModalShown=true;
+    closeMessageModal() {
+      this.smsMessage=''
+      this.isMessageModalShown = false;
     },
-    sendMessage(){
-
+    showSMSModal() {
+      this.isMessageModalShown = true;
+    },
+    async sendMessage() {
+      if(this.smsMessage=='')
+      return;
+      this.isLoading = true;
+      try {
+        const response = await apiClient.post(
+          "/api/broadcast_message",
+          this.smsMessage
+        );
+        if (response.status === 201) {
+          this.customers.push(response.data);
+          this.setAlertData(true, "You have broadcast message successfully");
+        } else throw "";
+      } catch (e) {
+        this.setAlertData(false, "Faild to broadcast message");
+      } finally {
+        this.isLoading = false;
+        this.dismissAlert();
+        this.closeMessageModal();
+      }
     },
     hasPermissionTo(act) {
       let index = this.user?.role?.permissions.findIndex(

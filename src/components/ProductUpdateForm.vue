@@ -426,7 +426,7 @@ export default {
           }}?language=${this.selectedLanguage.toLowerCase()}`,
           {
             language: this.selectedLanguage.toLowerCase(),
-            ...this.productInfo,
+            ...this.product,
           }
         );
         if (response.status === 200) {

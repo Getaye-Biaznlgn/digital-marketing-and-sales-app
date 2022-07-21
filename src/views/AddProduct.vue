@@ -1,6 +1,6 @@
 <template>
- <DetailPage title="Add Product">
-   <form @submit.prevent>
+  <DetailPage title="Add Product">
+    <form @submit.prevent>
       <div class="row">
         <base-card class="mt-2 col-lg-5">
           <div class="mb-3" :class="{ warining: v$.product.name.$error }">
@@ -69,16 +69,15 @@
             <label for="price" class="form-label">Price</label>
             <div class="input-group">
               <input
-              type="text"
-              class="form-control"
-              id="price"
-              v-model.trim="product.price"
-              @blur="v$.product.price.$touch"
-            />
-            <span class="input-group-text" id="weight-text">ETB</span>
-
+                type="text"
+                class="form-control"
+                id="price"
+                v-model.trim="product.price"
+                @blur="v$.product.price.$touch"
+              />
+              <span class="input-group-text" id="weight-text">ETB</span>
             </div>
-            
+
             <span
               class="error-msg mt-1"
               v-for="(error, index) of v$.product.price.$errors"
@@ -111,6 +110,7 @@
               type="number"
               class="form-control"
               id="qty"
+              min="0"
               v-model.trim="product.qty"
               @blur="v$.product.qty.$touch"
             />
@@ -190,7 +190,6 @@
           </div>
         </base-card>
         <base-card class="col-lg-5 mx-6">
-      
           <div class="mb-3" :class="{ warining: v$.product.brand.$error }">
             <label for="brand" class="form-label">Brand</label>
             <input
@@ -209,29 +208,30 @@
             >
           </div>
 
-         <!-- <div class=" mb-3">
+          <!-- <div class=" mb-3">
            <input type="text" class="form-control" placeholder="Recipient's username" aria-label="Recipient's username" aria-describedby="basic-addon2">
            <span class="input-group-text" id="basic-addon2">Kg</span>
          </div> -->
-         <div class="mb-3" :class="{ warining: v$.product.weight.$error }">
-         <label for="weight" class="form-label">Weight</label> <br/>
-         <div class="input-group" >
-            <input
-              type="number"
-              class="form-control"
-              id="weight"
-              v-model.trim="product.weight"
-              @blur="v$.product.weight.$touch"
-            />
-            <span class="input-group-text" id="weight-text">Kg</span>
-          </div>
-          <span
+          <div class="mb-3" :class="{ warining: v$.product.weight.$error }">
+            <label for="weight" class="form-label">Weight</label> <br />
+            <div class="input-group">
+              <input
+                type="number"
+                class="form-control"
+                id="weight"
+                min="0"
+                v-model.trim="product.weight"
+                @blur="v$.product.weight.$touch"
+              />
+              <span class="input-group-text" id="weight-text">Kg</span>
+            </div>
+            <span
               class="error-msg mt-1"
               v-for="(error, index) of v$.product.weight.$errors"
               :key="index"
               >{{ error.$message + ", " }}</span
             >
-            </div>
+          </div>
           <div
             class="mb-3"
             :class="{ warining: v$.product.maximum_supply_voltage.$error }"
@@ -241,15 +241,15 @@
             >
             <div class="input-group">
               <input
-              type="text"
-              class="form-control"
-              id="maximum_supply_voltage"
-              v-model.trim="product.maximum_supply_voltage"
-              @blur="v$.product.maximum_supply_voltage.$touch"
-            />
-            <span class="input-group-text" id="max-volt-text">V</span>
+                type="text"
+                class="form-control"
+                id="maximum_supply_voltage"
+                v-model.trim="product.maximum_supply_voltage"
+                @blur="v$.product.maximum_supply_voltage.$touch"
+              />
+              <span class="input-group-text" id="max-volt-text">V</span>
             </div>
-            
+
             <span
               class="error-msg mt-1"
               v-for="(error, index) of v$.product.maximum_supply_voltage
@@ -275,7 +275,7 @@
               />
               <span class="input-group-text" id="max-volt-text">W</span>
             </div>
-           
+
             <span
               class="error-msg mt-1"
               v-for="(error, index) of v$.product.maximum_current_power.$errors"
@@ -297,7 +297,6 @@
         :isSucceed="isRequestSucceed"
       />
     </form>
-
   </DetailPage>
 </template>
 
@@ -327,7 +326,7 @@ export default {
         maximum_current_power: "",
         price: "",
         qty: "",
-        weight: '',
+        weight: "",
         date_of_production: "",
         category_id: "",
         detail: "",
@@ -338,7 +337,7 @@ export default {
         detail: "",
         product_id: "",
       },
-      timeout:'',
+      timeout: "",
 
       //alert
       isAlertVisible: "",
@@ -350,9 +349,9 @@ export default {
     ...mapGetters(["categories"]),
   },
   methods: {
-     dismissAlert() {
-     this.timeout = setTimeout(() => {
-       this.isAlertVisible = false;
+    dismissAlert() {
+      this.timeout = setTimeout(() => {
+        this.isAlertVisible = false;
       }, 2000);
     },
     setAlertData(isRequestSucceed, message) {
@@ -360,8 +359,8 @@ export default {
       this.alertMessage = message;
       this.isRequestSucceed = isRequestSucceed;
     },
-     setImages(images) {
-      this.product_images=images
+    setImages(images) {
+      this.product_images = images;
     },
     setEditorValue(value) {
       this.product.detail = value;
@@ -387,29 +386,26 @@ export default {
           if (response.status === 201) {
             this.product_images = [];
 
-            this.setAlertData(true, 'Product is uploaded successfully.');
+            this.setAlertData(true, "Product is uploaded successfully.");
           } else throw "";
         } catch (e) {
-           this.setAlertData(false, 'Faild to upload product')
+          this.setAlertData(false, "Faild to upload product");
         } finally {
           this.isLoading = false;
-          this.dismissAlert()
+          this.dismissAlert();
         }
       }
     },
   },
-  beforeUnmount(){
-     clearTimeout(this.timeout)
+  beforeUnmount() {
+    clearTimeout(this.timeout);
   },
   validations() {
     return {
       product: {
         name: {
           required,
-          max: helpers.withMessage(
-            "The name is too large",
-            maxLength(300)
-          ),
+          max: helpers.withMessage("The name is too large", maxLength(300)),
         },
         description: {
           required,
