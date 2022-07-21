@@ -42,6 +42,7 @@
       </ul>
       <div>
         <button
+          v-if="hasPermissionTo('add shop')"
           @click="navigateToAddShop"
           class="btn ms-auto d-flex justify-self-end btn-bg-primary text-light"
         >
@@ -97,6 +98,7 @@
         <td>{{ shop.shop_status ? "Active" : "Inactive" }}</td>
         <td style="white-space: nowrap">
           <span
+            v-if="hasPermissionTo('edit shop')"
             class="me-2"
             @click="
               $router.push({
@@ -107,8 +109,13 @@
             role="button"
             ><i class="far fa-edit"></i
           ></span>
-          <span class="me-2" @click="showDeleteModal(shop)" role="button"
-            ><i class="fas fa-trash"></i
+          <span
+            v-if="hasPermissionTo('delete shop')"
+            class="me-2"
+            @click="showDeleteModal(shop)"
+            role="button"
+          >
+            <i class="fas fa-trash"></i
           ></span>
           <span
             @click="
@@ -185,7 +192,7 @@
 import apiClient from "../resources/baseUrl";
 import Paginate from "vuejs-paginate-next";
 import useValidate from "@vuelidate/core";
-import exportFromJSON from "export-from-json"
+import exportFromJSON from "export-from-json";
 // import { required, helpers, maxLength } from "@vuelidate/validators";
 export default {
   components: {
@@ -216,9 +223,21 @@ export default {
       isSearch: false,
     };
   },
+  computed: {
+    user() {
+      return this.$store.getters.user;
+    },
+  },
   methods: {
-     downloadCSV(){
-        const data = this.shops;
+    hasPermissionTo(act) {
+      let index = this.user?.role?.permissions.findIndex(
+        (per) => per.name.toLowerCase() === act.toLowerCase()
+      );
+      if (!isNaN(index) && index !== -1) return true;
+      return false;
+    },
+    downloadCSV() {
+      const data = this.shops;
       const fileName = "shops";
       const exportType = exportFromJSON.types.csv;
       if (data) exportFromJSON({ data, fileName, exportType });

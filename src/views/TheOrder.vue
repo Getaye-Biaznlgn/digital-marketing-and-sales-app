@@ -118,7 +118,8 @@
           <span class="me-2" @click="showDetail(order.id)" role="button"
             ><i class="far fa-eye"></i
           ></span>
-          <span @click="showDeleteModal(order)" role="button"
+          <span v-if="hasPermissionTo('delete order')" 
+            @click="showDeleteModal(order)" role="button"
             ><i class="fas fa-trash"></i
           ></span>
         </td>
@@ -264,7 +265,19 @@ export default {
       isSearch: false,
     };
   },
+  computed:{
+    user(){
+      return this.$store.getters.user;
+    }
+  },
   methods: {
+    hasPermissionTo(act) {
+      let index = this.user?.role?.permissions.findIndex(
+        (per) => per.name.toLowerCase() === act.toLowerCase()
+      );
+      if (!isNaN(index) && index !== -1) return true;
+      return false;
+    },
     downloadCSV() {
       const data = this.orders;
       const fileName = "orders";

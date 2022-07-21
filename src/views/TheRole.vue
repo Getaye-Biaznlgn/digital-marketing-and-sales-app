@@ -5,8 +5,8 @@
       In the role section, you will review and manage all roles with their
       permissions. You can view and edit role.
     </p>
-    <div>
-      <BaseButton @click="showModal" title="Add Role" />
+    <div >
+      <BaseButton v-if="hasPermissionTo('addRole')" @click="showModal" title="Add Role" />
     </div>
 
     <table>
@@ -34,7 +34,9 @@
           </button>
         </td>
         <td>
-          <span @click="showDeleteModal(role)" role="button"><i class="fas fa-trash"></i></span>
+          <span
+           v-if="hasPermissionTo('delete role')"
+           @click="showDeleteModal(role)" role="button"><i class="fas fa-trash"></i></span>
         </td>
       </tr>
     </table>
@@ -88,8 +90,19 @@ export default {
       //
     };
   },
-
+ computed:{
+  user(){
+    return this.$store.getters.user;
+  }
+ },
   methods: {
+    hasPermissionTo(act) {
+      let index = this.user?.role?.permissions.findIndex(
+        (per) => per.name.toLowerCase() === act.toLowerCase()
+      );
+      if (!isNaN(index) && index !== -1) return true;
+      return false;
+    },
     showModal() {
       this.isAddModalVisible = true;
     },

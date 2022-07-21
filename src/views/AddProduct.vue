@@ -317,7 +317,6 @@ export default {
     return {
       v$: useValidate(),
       isLoading: false,
-
       product_images: [],
       product: {
         name: "",

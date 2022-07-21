@@ -12,6 +12,7 @@
       ></TheSidebarItem>
       <TheSidebarItem
         @click="setSelected('TheProduct')"
+        v-if="hasPermissionTo('view product')"
         :isSelected="selectedRoute == 'TheProduct'"
         label="Product"
         routeName="TheProduct"
@@ -132,9 +133,9 @@ var selectedRoute = ref("");
 const store = useStore();
 var user = computed(() => store.getters.user);
 const setSelected = function (name) {
-  console.log('user', user);
   selectedRoute.value = name;
 };
+
 var hasPermissionTo = function (act) {
   let index = user.value?.role?.permissions.findIndex(
     (per) => per.name.toLowerCase() === act.toLowerCase()

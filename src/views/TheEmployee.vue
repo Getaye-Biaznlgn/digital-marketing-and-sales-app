@@ -6,6 +6,7 @@
       employees.
     </div>
     <button
+     v-if="hasPermissionTo('add employee')"
       @click="showAddModal"
       class="btn ms-auto d-flex justify-self-end btn-bg-primary text-light"
     >
@@ -79,6 +80,7 @@
             <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
               <li>
                 <a
+                 v-if="hasPermissionTo('edit employee')"
                   class="dropdown-item"
                   @click="showEditModal(employee)"
                   role="button"
@@ -87,6 +89,7 @@
               </li>
               <li>
                 <a
+                 v-if="hasPermissionTo('edit employee')"
                   class="dropdown-item"
                   @click="showChangeStatusModal(employee)"
                   role="button"
@@ -95,7 +98,8 @@
               </li>
               <li>
                 <a
-                  class="dropdown-item "
+                v-if="hasPermissionTo('edit employee')"
+                  class="dropdown-item"
                   @click="showChangeRoleModal(employee)"
                   role="button"
                   >Change Role</a
@@ -103,6 +107,7 @@
               </li>
               <li>
                 <a
+                 v-if="hasPermissionTo('delete employee')"
                   class="dropdown-item"
                   @click="showDeleteModal(employee)"
                   role="button"
@@ -260,16 +265,10 @@
         v-model="employeeForChangeStatus.is_active"
         class="form-control"
       >
-        <option
-          :disabled="employeeForChangeStatus.is_active == 0"
-          :value="0"
-        >
+        <option :disabled="employeeForChangeStatus.is_active == 0" :value="0">
           Inactive
         </option>
-        <option
-          :value="1"
-          :disabled="employeeForChangeStatus.is_active == 1"
-        >
+        <option :value="1" :disabled="employeeForChangeStatus.is_active == 1">
           Active
         </option>
       </select>
@@ -292,7 +291,12 @@
         v-model="employeeForChangeRole.roleId"
         class="form-control text-capitalize"
       >
-        <option  v-for="role in roles" :key="role.id" :value="role.id" class="text-capitalize">
+        <option
+          v-for="role in roles"
+          :key="role.id"
+          :value="role.id"
+          class="text-capitalize"
+        >
           {{ role.name }}
         </option>
       </select>
@@ -337,7 +341,7 @@ export default {
       employee: {
         first_name: "",
         last_name: "",
-        phone_number:" ",
+        phone_number: " ",
         email: "",
       },
       // alert
@@ -360,7 +364,19 @@ export default {
       employeeForChangeRole: {},
     };
   },
+  computed: {
+    user() {
+      return this.$store.getters.user;
+    },
+  },
   methods: {
+    hasPermissionTo(act) {
+      let index = this.user?.role?.permissions.findIndex(
+        (per) => per.name.toLowerCase() === act.toLowerCase()
+      );
+      if (!isNaN(index) && index !== -1) return true;
+      return false;
+    },
     downloadCSV() {
       const data = this.employees;
       const fileName = "employees";
@@ -372,7 +388,7 @@ export default {
         this.isAlertVisible = false;
       }, 2000);
     },
-   
+
     resetFieldEmpity() {
       this.employee = {
         first_name: "",
@@ -392,7 +408,7 @@ export default {
     showEditModal({ ...employee }) {
       this.forUpdate = true;
       this.employee = employee;
-      this.employee.phone_number= employee.phone_numbers?.[0]
+      this.employee.phone_number = employee.phone_numbers?.[0];
       this.isAddModalVisible = true;
     },
     showChangeStatusModal({ ...employee }) {
@@ -401,7 +417,7 @@ export default {
     },
     showChangeRoleModal({ ...employee }) {
       this.employeeForChangeRole = employee;
-      this.employeeForChangeRole.roleId=employee.role?.id
+      this.employeeForChangeRole.roleId = employee.role?.id;
       this.isChangeRoleModalVisible = true;
     },
     closeChangeRoleModal() {
@@ -424,8 +440,8 @@ export default {
       this.alertMessage = message;
       this.isRequestSucceed = isRequestSucceed;
     },
-    async changeRole(){
-       this.isLoading = true;
+    async changeRole() {
+      this.isLoading = true;
       try {
         const response = await apiClient.post(
           "/api/assign_role/" + this.employeeForChangeRole.id,
@@ -433,13 +449,12 @@ export default {
         );
         if (response.status === 200) {
           let index = this.employees.findIndex(
-            (employee) =>
-              employee.id === this.employeeForChangeRole.id
+            (employee) => employee.id === this.employeeForChangeRole.id
           );
-          this.employees[index].role ={
+          this.employees[index].role = {
             id: this.employeeForChangeRole.roleId,
-            name: response.data
-          }
+            name: response.data,
+          };
         } else throw "";
       } catch (e) {
         this.isAlertVisible = true;
@@ -448,7 +463,7 @@ export default {
       } finally {
         this.isLoading = false;
         this.closeChangeRoleModal();
-      }   
+      }
     },
     async changeStatus() {
       this.isLoading = true;
@@ -459,17 +474,16 @@ export default {
         );
         if (response.status === 200) {
           let index = this.employees.findIndex(
-            (employee) =>
-              employee.id === this.employeeForChangeStatus.id
+            (employee) => employee.id === this.employeeForChangeStatus.id
           );
           this.employees[index].is_active =
             this.employeeForChangeStatus.is_active;
-            this.setAlertData(true, "User role is changed successully")
+          this.setAlertData(true, "User role is changed successully");
         } else throw "";
       } catch (e) {
         this.isAlertVisible = true;
         this.alertMessage = "Faild to change user status";
-        this.setAlertData(false, "Faild to change user role")
+        this.setAlertData(false, "Faild to change user role");
       } finally {
         this.isLoading = false;
         this.closeChangeStatusModal();
@@ -491,23 +505,22 @@ export default {
       }
     },
     async updateEmployee() {
-      
       this.v$.$validate();
       if (!this.v$.$error) {
         this.isLoading = true;
         try {
           const response = await apiClient.put(
             `/api/system_users/${this.employee.id}`,
-             
-              this.employee
-            
+
+            this.employee
           );
           if (response.status === 200) {
             const editedIndex = this.employees.findIndex((employee) => {
               return this.employee.id === employee.id;
             });
-            this.employees[editedIndex] ={...this.employee} ;
-            this.employees[editedIndex].phone_numbers[0]=this.employee.phone_number
+            this.employees[editedIndex] = { ...this.employee };
+            this.employees[editedIndex].phone_numbers[0] =
+              this.employee.phone_number;
             this.setAlertData(true, "employee updated successfully");
             ///
           } else throw "";
@@ -531,14 +544,10 @@ export default {
       if (!this.v$.$error) {
         this.isLoading = true;
         try {
-          const response = await apiClient.post(
-            "/api/managers",
-            {
-              ...this.employee,
-              phone_numbers: [this.employee.phone_number]
-            }
-            
-          );
+          const response = await apiClient.post("/api/system_user", {
+            ...this.employee,
+            phone_numbers: [this.employee.phone_number],
+          });
           if (response.status === 201) {
             this.employees.push(response.data);
             this.setAlertData(true, "You have added employees successfully");

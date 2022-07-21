@@ -315,11 +315,11 @@ export default {
         },
         latitude: {
           required: helpers.withMessage("Latitude is required", required),
-          numeric
+          // numeric
         },
         longitude: {
           required: helpers.withMessage("Longitude is required", required),
-          numeric
+          // numeric
         },
       },
     };

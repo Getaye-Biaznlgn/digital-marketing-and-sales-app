@@ -6,6 +6,7 @@
       customers.
     </div>
     <button
+      v-if="hasPermissionTo('add customer')"
       @click="showAddModal"
       class="btn ms-auto d-flex justify-self-end btn-bg-primary text-light"
     >
@@ -13,7 +14,7 @@
     </button>
     <hr />
     <div class="d-flex p-2 justify-content-between selection-bar">
-    <div class="position-relative w-50  me-2">
+      <div class="position-relative w-50 me-2">
         <input
           type="text"
           v-model="searchQuery"
@@ -23,12 +24,15 @@
           aria-label="Recipient's username"
           aria-describedby="basic-add"
         />
-        <span @click="searchCustomers" role="button" class="position-absolute  end-0 top-0 p-2 me-2"
+        <span
+          @click="searchCustomers"
+          role="button"
+          class="position-absolute end-0 top-0 p-2 me-2"
           ><i class="fas fa-search"></i
         ></span>
       </div>
 
-     <div>
+      <div>
         <button @click="downloadCSV()" class="btn border">Export</button>
       </div>
     </div>
@@ -43,18 +47,26 @@
         <th>Status</th>
         <th><span class="sr-only">Action</span></th>
       </tr>
-      <tr v-for="(customer, index) in customers" :key="customer.id">
+      <tr v-for="(customer, index) in customers" :key="customer.customer_id">
         <td>{{ pageNo * perPage - perPage + index + 1 }}</td>
         <td class="text-capitalize">
           {{ customer.first_name + " " + customer.last_name }}
         </td>
         <td>{{ customer.phone_number }}</td>
-        <td >
-          <span v-if="customer.joined_date">{{ (new Date(customer.joined_date)).toString().split(' ').slice(0,4).join(' ')  }}</span
+        <td>
+          <span v-if="customer.joined_date">{{
+            new Date(customer.joined_date)
+              .toString()
+              .split(" ")
+              .slice(0, 4)
+              .join(" ")
+          }}</span
           ><span v-else>--/--</span>
         </td>
-        <td>{{ customer.user_region??''}}-{{customer.user_woreda??''}}</td>
-        <td>{{customer.customer_status===1? 'Active': 'Inactive'}}</td>
+        <td>
+          {{ customer.user_region ?? "" }}-{{ customer.user_woreda ?? "" }}
+        </td>
+        <td>{{ customer.customer_status === 1 ? "Active" : "Inactive" }}</td>
         <td>
           <!-- <span class="me-2" @click="showEditModal(customer)" role="button"
             ><i class="far fa-edit"></i
@@ -62,7 +74,7 @@
           <span  role="button"
             ><i class="fas fa-trash"></i
           ></span> -->
-                    <div class="dropdown">
+          <div class="dropdown">
             <a
               class="dropdown-toggl text-dark"
               href="#"
@@ -75,7 +87,7 @@
             </a>
 
             <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-              <li>
+              <li v-if="hasPermissionTo('edit customer')">
                 <a
                   class="dropdown-item"
                   @click="showEditModal(customer)"
@@ -83,7 +95,7 @@
                   >Edit</a
                 >
               </li>
-              <li>
+              <li v-if="hasPermissionTo('edit customer')">
                 <a
                   class="dropdown-item"
                   @click="showChangeStatusModal(customer)"
@@ -91,7 +103,7 @@
                   >Change Status</a
                 >
               </li>
-               <li>
+              <li v-if="hasPermissionTo('delete customer')">
                 <a
                   class="dropdown-item"
                   @click="showDeleteModal(customer)"
@@ -104,34 +116,33 @@
         </td>
       </tr>
     </table>
-  <div v-if="!customers.length" class="mt-2 text-center">No record</div>
+    <div v-if="!customers.length" class="mt-2 text-center">No record</div>
+    <!-- pagination -->
+    <div class="d-flex justify-content-end mt-2 mb-3 me-2">
+      <div class="me-3">
+        <select
+          @change="handlePerPage()"
+          v-model="perPage"
+          class="form-select"
+          aria-label="perPage"
+        >
+          <option value="5">5</option>
+          <option value="10" selected>10</option>
+          <option value="25">25</option>
+          <option value="50">50</option>
+          <option value="100">100</option>
+        </select>
+      </div>
 
-      <!-- pagination -->
-  <div class="d-flex justify-content-end mt-2 mb-3 me-2">
-    <div class="me-3">
-      <select
-        @change="handlePerPage()"
-        v-model="perPage"
-        class="form-select"
-        aria-label="perPage"
+      <paginate
+        :page-count="totalPage"
+        :click-handler="fetchByPageNo"
+        :prev-text="'Prev'"
+        :next-text="'Next'"
+        :container-class="'d-flex nav page-item'"
       >
-        <option value="5">5</option>
-        <option value="10" selected>10</option>
-        <option value="25">25</option>
-        <option value="50">50</option>
-        <option value="100">100</option>
-      </select>
+      </paginate>
     </div>
-
-    <paginate
-      :page-count="totalPage"
-      :click-handler="fetchByPageNo"
-      :prev-text="'Prev'"
-      :next-text="'Next'"
-      :container-class="'d-flex nav page-item'"
-    >
-    </paginate>
-  </div>
   </div>
 
   <!-- add customers -->
@@ -267,7 +278,9 @@
   >
     <p>
       Do u want to delete? <br />
-    <strong>{{ customerForDelete?.first_name+' '+ customerForDelete?.last_name}}</strong>  
+      <strong>{{
+        customerForDelete?.first_name + " " + customerForDelete?.last_name
+      }}</strong>
     </p>
   </base-modal>
 
@@ -299,7 +312,6 @@
         >
           Active
         </option>
-       
       </select>
     </div>
   </base-modal>
@@ -322,12 +334,11 @@ import {
   helpers,
   email,
   maxLength,
-  numeric,
 } from "@vuelidate/validators";
-import exportFromJSON from "export-from-json"
+import exportFromJSON from "export-from-json";
 export default {
-  components:{
-    Paginate
+  components: {
+    Paginate,
   },
   data() {
     return {
@@ -335,7 +346,7 @@ export default {
       isAddModalVisible: false,
       isDeleteModalVisible: false,
       customerForDelete: {},
-      searchQuery:'',
+      searchQuery: "",
       isLoading: false,
       customers: [],
       customer: {
@@ -360,14 +371,26 @@ export default {
       perPage: 10,
       pageNo: 1,
       totalPage: "",
-    // 
-    isChangeStatusModalVisible:false,
-    customerForChangeStatus:{}
+      //
+      isChangeStatusModalVisible: false,
+      customerForChangeStatus: {},
     };
   },
+  computed: {
+    user() {
+      return this.$store.getters.user;
+    },
+  },
   methods: {
-     downloadCSV(){
-        const data = this.customers;
+    hasPermissionTo(act) {
+      let index = this.user?.role?.permissions.findIndex(
+        (per) => per.name.toLowerCase() === act.toLowerCase()
+      );
+      if (!isNaN(index) && index !== -1) return true;
+      return false;
+    },
+    downloadCSV() {
+      const data = this.customers;
       const fileName = "customers";
       const exportType = exportFromJSON.types.csv;
       if (data) exportFromJSON({ data, fileName, exportType });
@@ -378,7 +401,7 @@ export default {
       }, 2000);
     },
     resetFieldEmpity() {
-      this.customer={
+      this.customer = {
         first_name: "",
         last_name: "",
         phone_number: "",
@@ -386,7 +409,7 @@ export default {
         user_region: "",
         user_zone: "",
         user_woreda: "",
-      }
+      };
     },
     showDeleteModal({ ...customer }) {
       this.customerForDelete = customer;
@@ -401,12 +424,12 @@ export default {
       this.customer = customer;
       this.isAddModalVisible = true;
     },
-    showChangeStatusModal({...customer}){
-      this.customerForChangeStatus=customer
-      this.isChangeStatusModalVisible=true
+    showChangeStatusModal({ ...customer }) {
+      this.customerForChangeStatus = customer;
+      this.isChangeStatusModalVisible = true;
     },
-    closeChangeStatusModal(){
-      this.isChangeStatusModalVisible=false
+    closeChangeStatusModal() {
+      this.isChangeStatusModalVisible = false;
     },
     closeAddModal() {
       this.v$.$reset();
@@ -422,8 +445,8 @@ export default {
       this.alertMessage = message;
       this.isRequestSucceed = isRequestSucceed;
     },
-   async changeStatus(){
-          this.isLoading = true;
+    async changeStatus() {
+      this.isLoading = true;
       try {
         const response = await apiClient.post(
           "/api/change_user_status/" + this.customerForChangeStatus.customer_id,
@@ -431,7 +454,8 @@ export default {
         );
         if (response.status === 200) {
           let index = this.customers.findIndex(
-            (customer) => customer.customer_id === this.customerForChangeStatus.customer_id
+            (customer) =>
+              customer.customer_id === this.customerForChangeStatus.customer_id
           );
           this.customers[index].customer_status =
             this.customerForChangeStatus.customer_status;
@@ -455,8 +479,8 @@ export default {
             this.customer
           );
           if (response.status === 200) {
-            const editedIndex = this.customers.findIndex((customer) => {
-              return this.customer.id === customer.id;
+            const editedIndex = this.customers.findIndex((cust) => {
+              return this.customer.customer_id === cust.customer_id;
             });
             this.customers[editedIndex] = this.customer;
             this.setAlertData(true, "Customer updated successfully");
@@ -482,7 +506,10 @@ export default {
       if (!this.v$.$error) {
         this.isLoading = true;
         try {
-          const response = await apiClient.post("/api/add_user_by_admin", this.customer);
+          const response = await apiClient.post(
+            "/api/add_user_by_admin",
+            this.customer
+          );
           if (response.status === 201) {
             this.customers.push(response.data);
             this.setAlertData(true, "You have added customers successfully");
@@ -517,14 +544,16 @@ export default {
         this.closeDeleteModal();
       }
     },
-    async searchCustomers(){
-        this.pageNo=1
-          this.fetchCustomers()
+    async searchCustomers() {
+      this.pageNo = 1;
+      this.fetchCustomers();
     },
     async fetchCustomers() {
       try {
         this.$store.commit("setIsLoading", true);
-        const response = await apiClient.get(`/api/users?search=${this.searchQuery}&&page=${this.pageNo}&&per_page=${this.perPage}`);
+        const response = await apiClient.get(
+          `/api/users?search=${this.searchQuery}&&page=${this.pageNo}&&per_page=${this.perPage}`
+        );
         if (response.status === 200) {
           this.customers = response.data.data;
           this.perPage = response.data.meta.per_page;
@@ -537,13 +566,13 @@ export default {
         this.$store.commit("setIsLoading", false);
       }
     },
-     //paginations
+    //paginations
     fetchByPageNo(no) {
       this.pageNo = no;
       this.fetchCustomers(this.filterString);
     },
     handlePerPage() {
-      this.pageNo=1
+      this.pageNo = 1;
       this.fetchCustomers(this.filterString);
     },
   },
@@ -563,8 +592,7 @@ export default {
           required: helpers.withMessage("Last name is required", required),
         },
         phone_number: {
-          numeric,
-          max: maxLength(10),
+          max: maxLength(13),
           required: helpers.withMessage("Phone number is required", required),
         },
         email: {

@@ -26,9 +26,9 @@
         <!-- <span class="me-2" @click="showEditModal(product)" role="button"
           ><i class="far fa-edit"></i
         ></span> -->
-        <span class="me-2" @click="showDeleteModal(product)" role="button"
-              ><i class="fas fa-trash"></i
-            ></span>
+        <span class="me-2" @click="deleteProduct(product)" role="button"
+          ><i class="fas fa-trash"></i
+        ></span>
       </td>
     </tr>
   </table>
@@ -71,7 +71,7 @@
             placeholder="Qty"
             @blur="setValue(product.id, $event)"
             name="qty"
-            :id="'qty' +index "
+            :id="'qty' + index"
           />
         </div>
         <!-- <button @click="addProduct({product_id:product.id, qty})" class="btn btn-primary text-light" >Add</button> -->
@@ -98,14 +98,14 @@ export default {
     shopId: {
       required: true,
     },
-    shopProducts:{
-      required:false
-    }
+    shopProducts: {
+      required: false,
+    },
   },
-  emits:{
-     newProductAdded(){
-      return true
-     }
+  emits: {
+    newProductAdded() {
+      return true;
+    },
   },
   data() {
     return {
@@ -156,8 +156,8 @@ export default {
         }
       }
     },
-    showDeleteModal(){
-
+    async deleteProduct(product) {
+     this.$emit('deletePendingProduct', product)
     },
     showSendModal() {
       this.isSendProductModalVisible = true;

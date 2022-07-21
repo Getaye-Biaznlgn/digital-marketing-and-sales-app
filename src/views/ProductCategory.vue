@@ -1,45 +1,63 @@
 <template>
-<div class="m-3">
+  <div class="m-3">
     <h5>Product Category</h5>
-  <div>
-    In the category section, you will review and manage 
-    all solar product categories.
-  </div>
-   <button @click="showAddModal" class="btn ms-auto d-flex justify-self-end btn-bg-primary text-light">
-        Add New Category
-   </button>
-<hr/>
-  <!-- Table -->
-      <table class="mt-2">
+    <div>
+      In the category section, you will review and manage all solar product
+      categories.
+    </div>
+    <button
+      v-if="hasPermissionTo('add category')"
+      @click="showAddModal"
+      class="btn ms-auto d-flex justify-self-end btn-bg-primary text-light"
+    >
+      Add New Category
+    </button>
+    <hr />
+    <!-- Table -->
+    <table class="mt-2">
       <tr>
         <th>No</th>
         <th>Name</th>
         <th>Description</th>
         <th><span class="sr-only">Action</span></th>
       </tr>
-      <tr v-for="(category, index) in categories"
-        :key="category.id">
-        <td>{{index+1}}</td>
-        <td>{{category.title}}</td>
-        <td>{{category.description?.slice(0,50)}}...</td>
-        <td style="white-space:nowrap;">
+      <tr v-for="(category, index) in categories" :key="category.id">
+        <td>{{ index + 1 }}</td>
+        <td>{{ category.title }}</td>
+        <td>{{ category.description?.slice(0, 50) }}...</td>
+        <td style="white-space: nowrap">
           <span class="me-2" @click="showDetailModal(category)" role="button"
             ><i class="far fa-eye"></i
           ></span>
-          <span class="me-2" @click="$router.push({name:'CategoryDetail', params:{id:category.id} })" role="button"
+          <span
+          v-if="hasPermissionTo('edit category')"
+            class="me-2"
+            @click="
+              $router.push({
+                name: 'CategoryDetail',
+                params: { id: category.id },
+              })
+            "
+            role="button"
             ><i class="far fa-edit"></i
           ></span>
-          <span  @click="showDeleteModal(category)" role="button"
+          <span v-if="hasPermissionTo('delete category')" @click="showDeleteModal(category)" role="button"
             ><i class="fas fa-trash"></i
           ></span>
         </td>
       </tr>
     </table>
-</div>
-    <!-- add categories -->
-<base-modal :modalState="isAddModalVisible" title="Category" @close="closeAddModal" :btnLabel="forDetail?'OK' :'Save'" 
-  :isLoading="isLoading" @submit="addNewCategory">
-     <form @submit.prevent>
+  </div>
+  <!-- add categories -->
+  <base-modal
+    :modalState="isAddModalVisible"
+    title="Category"
+    @close="closeAddModal"
+    :btnLabel="forDetail ? 'OK' : 'Save'"
+    :isLoading="isLoading"
+    @submit="addNewCategory"
+  >
+    <form @submit.prevent>
       <div class="mb-3" :class="{ warining: v$.category.title.$error }">
         <label for="title" class="form-label">Name</label>
         <input
@@ -62,7 +80,7 @@
       <div class="mb-3" :class="{ warining: v$.category.description.$error }">
         <label for="description" class="form-label">Description</label>
         <textarea
-        rows="5"
+          rows="5"
           class="form-control"
           id="description"
           :disabled="forDetail"
@@ -77,20 +95,26 @@
           {{ error.$message + ", " }}</span
         >
       </div>
-                <multiple-image-upload v-if="!forDetail" @saveImage="setImages" />
-
-     </form>
+      <multiple-image-upload v-if="!forDetail" @saveImage="setImages" />
+    </form>
   </base-modal>
 
   <!-- delete base modal -->
-  <base-modal :modalState="isDeleteModalVisible" btnLabel="Delete" :isLoading="isLoading"
-   title="Delete Image" @close="closeDeleteModal" @submit="deleteCategory">
-    <p>Do u want to delete? <br>
-     {{categoryForDelete?.title}}
+  <base-modal
+    :modalState="isDeleteModalVisible"
+    btnLabel="Delete"
+    :isLoading="isLoading"
+    title="Delete Category"
+    @close="closeDeleteModal"
+    @submit="deleteCategory"
+  >
+    <p>
+      Do u want to delete? <br />
+      {{ categoryForDelete?.title }}
     </p>
   </base-modal>
 
-    <!--to show delete image is failed  -->
+  <!--to show delete image is failed  -->
   <the-alert
     :isVisible="isAlertVisible"
     :message="alertMessage"
@@ -99,71 +123,82 @@
 </template>
 
 <script>
-import apiClient from '../resources/baseUrl'
+import apiClient from "../resources/baseUrl";
 import useValidate from "@vuelidate/core";
-import MultipleImageUpload from "../components/MultipleImageUpload.vue"
+import MultipleImageUpload from "../components/MultipleImageUpload.vue";
 import { required, helpers } from "@vuelidate/validators";
 export default {
-  components:{
-       MultipleImageUpload
+  components: {
+    MultipleImageUpload,
   },
-    data(){
-        return{
-            v$:useValidate(),
-            isAddModalVisible:false,
-            isDeleteModalVisible:false,
-            categoryForDelete:{},
-            alertMessage:'',
-            
-            isLoading: false,
-            categories:[],
-            category:{
-                title:'',
-                description:''
-            },
-            image:"",
-            // alert
-            isAlertVisible:false,
-            timeout: '',
-            // to use add modal as edit depend on the condition and #forDetail to 
-            //chage the action which should be performed 
-            forDetail:false,
+  data() {
+    return {
+      v$: useValidate(),
+      isAddModalVisible: false,
+      isDeleteModalVisible: false,
+      categoryForDelete: {},
+      alertMessage: "",
 
-        }
-    },
-    methods:{
-      setImages(images){
-        this.image=images?.[0]
+      isLoading: false,
+      categories: [],
+      category: {
+        title: "",
+        description: "",
       },
-       dismissAlert() {
+      image: "",
+      // alert
+      isAlertVisible: false,
+      timeout: "",
+      // to use add modal as edit depend on the condition and #forDetail to
+      //chage the action which should be performed
+      forDetail: false,
+    };
+  },
+  computed:{
+   user(){
+    return this.$store.getters.user;
+   }
+  },
+  
+  methods: {
+    hasPermissionTo(act) {
+      let index = this.user?.role?.permissions.findIndex(
+        (per) => per.name.toLowerCase() === act.toLowerCase()
+      );
+      if (!isNaN(index) && index !== -1) return true;
+      return false;
+    },
+    setImages(images) {
+      this.image = images?.[0];
+    },
+    dismissAlert() {
       this.timeout = setTimeout(() => {
         this.isAlertVisible = false;
       }, 2000);
     },
-     resetFieldEmpity(){
-      this.category.title='',
-      this.category.description=''
-     },
-     showDeleteModal({...catagory}){
-      this.categoryForDelete=catagory
-       this.isDeleteModalVisible=true
-     },
-     closeDeleteModal(){
-       this.isDeleteModalVisible=false
-     },
-     showDetailModal({...catagory}){
-       this.forDetail=true;
-        this.category=catagory
-        this.isAddModalVisible=true
-     },
-       closeAddModal(){
-          this.v$.$reset()
-          this.resetFieldEmpity()
-          this.isAddModalVisible=false
-         },
-         showAddModal(){
-            this.isAddModalVisible=true
-         },
+    resetFieldEmpity() {
+      (this.category.title = ""), (this.category.description = "");
+    },
+    showDeleteModal({ ...catagory }) {
+      this.categoryForDelete = catagory;
+      this.isDeleteModalVisible = true;
+    },
+    closeDeleteModal() {
+      this.isDeleteModalVisible = false;
+    },
+    showDetailModal({ ...catagory }) {
+      this.forDetail = true;
+      this.category = catagory;
+      this.isAddModalVisible = true;
+    },
+    closeAddModal() {
+      this.v$.$reset();
+      this.resetFieldEmpity();
+      this.isAddModalVisible = false;
+    },
+    showAddModal() {
+      this.isAddModalVisible = true;
+    },
     // async updateCategory(){
     //   this.v$.$validate();
     //   if (!this.v$.$error) {
@@ -189,98 +224,96 @@ export default {
     //   }
     //  },
 
-     async addNewCategory(){
-      if(this.forDetail){
-       return this.closeAddModal();
-        
+    async addNewCategory() {
+      if (this.forDetail) {
+        return this.closeAddModal();
       }
-        
+
       this.v$.$validate();
       if (!this.v$.$error) {
         this.isLoading = true;
-        var fd= new FormData()
+        var fd = new FormData();
         fd.append(`image`, this.image);
         for (const attr in this.category) {
           fd.append(attr, this.category[attr]);
         }
-        
+
         try {
-          const response = await apiClient.post("/api/categories", fd,{
+          const response = await apiClient.post("/api/categories", fd, {
             headers: {
               "Content-Type": "multipart/form-data",
               Accept: "application/json",
             },
           });
-          
+
           if (response.status === 201) {
             this.categories.push(response.data);
           } else throw "";
         } catch (e) {
-             this.isAlertVisible=true
-             this.alertMessage="Faild to add a new category"
-             this.dismissAlert();
+          this.isAlertVisible = true;
+          this.alertMessage = "Faild to add a new category";
+          this.dismissAlert();
         } finally {
           this.isLoading = false;
           this.closeAddModal();
         }
       }
-   },
-   async deleteCategory(){
-        this.isLoading = true;
+    },
+    async deleteCategory() {
+      this.isLoading = true;
       try {
         const response = await apiClient.delete(
           `/api/categories/${this.categoryForDelete.id}`
         );
         if (response.status === 200) {
-          const deletedIndex = this.categories.findIndex((category)=> {
+          const deletedIndex = this.categories.findIndex((category) => {
             return category.id === this.categoryForDelete.id;
           });
-          this.categories.splice(deletedIndex, 1);     
+          this.categories.splice(deletedIndex, 1);
         }
       } catch (e) {
-        this.isAlertVisible=true
-        this.alertMessage="Faild to delete a new category"
+        this.isAlertVisible = true;
+        this.alertMessage = "Faild to delete a new category";
         this.dismissAlert();
       } finally {
         this.isLoading = false;
         this.closeDeleteModal();
-        
       }
-   },
-     async fetchCategories(){
-       try {
+    },
+    async fetchCategories() {
+      try {
         this.$store.commit("setIsLoading", true);
-        const response = await apiClient.get(
-          `/api/categories`
-        );
+        const response = await apiClient.get(`/api/categories`);
         if (response.status === 200) {
-           this.categories=response.data
+          this.categories = response.data;
         }
       } catch (e) {
         //
       } finally {
         this.$store.commit("setIsLoading", false);
-      }  
-   }
- },
- created(){
-   this.fetchCategories()
- },
-   beforeUnmount(){
-    clearTimeout(this.timeout)
-   },
-   validations() { 
+      }
+    },
+  },
+  created() {
+    this.fetchCategories();
+  },
+  beforeUnmount() {
+    clearTimeout(this.timeout);
+  },
+  validations() {
     return {
       category: {
         title: {
-          required: helpers.withMessage('category title is required', required),
+          required: helpers.withMessage("category title is required", required),
         },
-        description:{
-            required: helpers.withMessage('category description is required', required),
-        }
-      }
-    }
-  }
-}
+        description: {
+          required: helpers.withMessage(
+            "category description is required",
+            required
+          ),
+        },
+      },
+    };
+  },
+};
 </script>
-

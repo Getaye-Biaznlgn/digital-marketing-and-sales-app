@@ -57,7 +57,7 @@
         <td class="text-capitalize">{{ agent.manager_region }}</td>
         <td class="text-capitalize">{{ agent.manager_city }}</td>
         <td class="d-flex">
-          <span class="me-2" @click="showEditModal(agent)" role="button"
+          <span v-if="hasPermissionTo('edit agent')" class="me-2" @click="showEditModal(agent)" role="button"
             ><i class="far fa-edit"></i
           ></span>
           <!-- <span @click="showDetailModal(agent)" role="button"
@@ -292,7 +292,19 @@ export default {
       totalPage: 0,
     };
   },
+  computed:{
+   user(){
+    return this.$store.getters.user;
+   }
+  },
   methods: {
+    hasPermissionTo(act) {
+        let index = this.user?.role?.permissions.findIndex(
+        (per) => per.name.toLowerCase() === act.toLowerCase()
+      );
+      if (!isNaN(index) && index !== -1) return true;
+      return false;
+    },
     downloadCSV() {
       const data = this.agents;
       const fileName = "agents";

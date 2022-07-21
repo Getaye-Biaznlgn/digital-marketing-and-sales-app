@@ -71,7 +71,7 @@
           </a>
         </li>
       </ul>
-      <button @click="showAddModal" class="btn btn-bg-primary mb-1 text-light">
+      <button @click="showAddModal" v-if="hasPermissionTo('add product')" class="btn btn-bg-primary mb-1 text-light">
         Add New Product
       </button>
     </div>
@@ -88,21 +88,34 @@
           @keyup.enter="searchProduct(searchValue)"
           aria-describedby="basic-add"
         />
-        <span @click="searchProduct(searchValue)" role="button" class="position-absolute end-0 top-0 p-2 me-2"
+        <span
+          @click="searchProduct(searchValue)"
+          role="button"
+          class="position-absolute end-0 top-0 p-2 me-2"
           ><i class="fas fa-search"></i
         ></span>
       </div>
       <div class="d-flex">
-         <div class="pe-2">
-          <select class="form-select" v-model="selectedCategory" @change="fetchProducts(filterString)" aria-label="selectFilte">
+        <div class="pe-2">
+          <select
+            class="form-select"
+            v-model="selectedCategory"
+            @change="fetchProducts(filterString)"
+            aria-label="selectFilte"
+          >
             <option value="all">All</option>
-            <option v-for="category in categories" :key="category.id"  :value="category.id">{{category.title}}</option>
+            <option
+              v-for="category in categories"
+              :key="category.id"
+              :value="category.id"
+            >
+              {{ category.title }}
+            </option>
           </select>
         </div>
         <div>
           <button @click="downloadCSV()" class="btn border">Export</button>
         </div>
-        
       </div>
     </div>
     <!-- Table -->
@@ -135,7 +148,9 @@
         <td>{{ product.qty }}</td>
         <td>{{ product.weight }}</td>
         <td>{{ product.category?.title }}</td>
-        <td style="white-space:nowrap;">{{ product.is_active ? "Active" : "In active" }}</td>
+        <td style="white-space: nowrap">
+          {{ product.is_active ? "Active" : "In active" }}
+        </td>
         <td class="d-flex">
           <span
             class="me-2"
@@ -149,6 +164,7 @@
             ><i class="far fa-eye"></i
           ></span>
           <span
+          v-if="hasPermissionTo('edit product')"
             class="me-2"
             @click="
               $router.push({
@@ -159,14 +175,15 @@
             role="button"
             ><i class="far fa-edit"></i
           ></span>
-          <span @click="showDeleteModal(product)" role="button"
+          <span 
+           v-if="hasPermissionTo('delete product')"
+          @click="showDeleteModal(product)" role="button"
             ><i class="fas fa-trash"></i
           ></span>
         </td>
       </tr>
     </table>
-            <div v-if="!products.length" class="mt-2 text-center">No record</div>
-
+    <div v-if="!products.length" class="mt-2 text-center">No record</div>
   </div>
   <!-- pagination -->
   <div class="d-flex justify-content-end mb-3 me-2">
@@ -218,7 +235,7 @@
 <script>
 import apiClient from "../resources/baseUrl";
 import Paginate from "vuejs-paginate-next";
-import exportFromJSON from "export-from-json"
+import exportFromJSON from "export-from-json";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import { ref, onBeforeUnmount, computed } from "vue";
@@ -232,7 +249,7 @@ export default {
     // const products = computed(() => store.getters.products);
     var isLoading = ref(false);
     var productForDelete = ref();
-    var selectedCategory =ref('all');
+    var selectedCategory = ref("all");
     var isAlertVisible = ref(false);
     var timeout = ref(false);
     var searchValue = ref("");
@@ -242,6 +259,15 @@ export default {
     var pageNo = ref(1);
     var totalPage = ref(0);
 
+    var user = computed(() => store.getters.user);
+
+    var hasPermissionTo = function (act) {
+      let index = user.value?.role?.permissions.findIndex(
+        (per) => per.name.toLowerCase() === act.toLowerCase()
+      );
+      if (!isNaN(index) && index !== -1) return true;
+      return false;
+    };
     // var filteredProduct = computed(() => {
     //   if (searchValue.value == "") {
     //     return products.value;
@@ -250,24 +276,24 @@ export default {
     //     product.name.toLowerCase().includes(searchValue.value.toLowerCase())
     //   );
     // });
-     const downloadCSV=function(){
-        const data = this.products;
+    const downloadCSV = function () {
+      const data = this.products;
       const fileName = "products";
       const exportType = exportFromJSON.types.csv;
       if (data) exportFromJSON({ data, fileName, exportType });
-    }
-    const categories= computed(()=>store.getters.categories) 
+    };
+    const categories = computed(() => store.getters.categories);
 
     const searchProduct = async function (searchQuery) {
-       try {
+      try {
         store.commit("setIsLoading", true);
         const response = await apiClient.get(
           `/api/search?search=${searchQuery}`
         );
         if (response.status === 200) {
           products.value = response.data.data;
-          filterString.value = '';
-          
+          filterString.value = "";
+
           // perPage.value = response.data.meta.per_page;
           // pageNo.value = response.data.meta.current_page;
           // totalPage.value = response.data.meta.last_page;
@@ -278,31 +304,31 @@ export default {
         store.commit("setIsLoading", false);
       }
     };
-    const fetchByFilter= async function (filter){
-        pageNo.value=1
-       fetchProducts(filter)
-    }
+    const fetchByFilter = async function (filter) {
+      pageNo.value = 1;
+      fetchProducts(filter);
+    };
     const fetchByPageNo = async function (no) {
       pageNo.value = no;
       fetchProducts(filterString.value);
     };
     const handlePerPage = async function () {
-      pageNo.value=1
+      pageNo.value = 1;
       fetchProducts(filterString.value);
     };
     const fetchProducts = async function (query) {
       try {
         store.commit("setIsLoading", true);
-        searchValue.value=''
+        searchValue.value = "";
         let response;
-        if(selectedCategory.value==='all')
-       response = await apiClient.get(
-          `/api/products?filter=${query}&&page=${pageNo.value}&&per_page=${perPage.value}`
-        );
+        if (selectedCategory.value === "all")
+          response = await apiClient.get(
+            `/api/products?filter=${query}&&page=${pageNo.value}&&per_page=${perPage.value}`
+          );
         else
-         response = await apiClient.get(
-          `/api/products?filter=${query}&&page=${pageNo.value}&&per_page=${perPage.value}&&category=${selectedCategory.value}`
-        );
+          response = await apiClient.get(
+            `/api/products?filter=${query}&&page=${pageNo.value}&&per_page=${perPage.value}&&category=${selectedCategory.value}`
+          );
 
         if (response.status === 200) {
           products.value = response.data.data;
@@ -318,7 +344,6 @@ export default {
       }
     };
 
-    
     var showAddModal = function () {
       router.push({ name: "AddProduct" });
       // productForDelete.value= product
@@ -338,11 +363,27 @@ export default {
         // const response = await apiClient.delete(
         //   `/api/products/${productForDelete.value.id}`
         // );
-        store.dispatch("deleteProducts", productForDelete.value.id);
-        closeDeleteModal();
+        // store.dispatch("deleteProducts", productForDelete.value.id);
+         const response = await apiClient.delete(
+          `/api/products/${productForDelete.value.id}`
+        );
+
+        if (response.status === 200) {
+          var previousData = products.value;
+          const deletedIndex = previousData.findIndex((product) => {
+            return product.id === productForDelete.value.id;
+          });
+          previousData.splice(deletedIndex, 1)
+         products.value= previousData; 
+        } else{
+          throw 'faild to delete'
+        }
+        
       } catch (e) {
+
         isAlertVisible.value = true;
       } finally {
+        closeDeleteModal();
         isDeleteModalVisible.value = false;
         isLoading.value = false;
         dismissAlert();
@@ -357,7 +398,7 @@ export default {
     onBeforeUnmount(function () {
       clearTimeout(timeout);
     });
-  
+
     // store.dispatch("fetchProducts");
     fetchProducts("all");
     return {
@@ -371,6 +412,7 @@ export default {
       searchProduct,
       fetchByFilter,
       downloadCSV,
+      hasPermissionTo,
       categories,
       isAlertVisible,
       selectedCategory,
