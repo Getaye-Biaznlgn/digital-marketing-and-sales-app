@@ -6,7 +6,7 @@
       permissions. You can view and edit role.
     </p>
     <div >
-      <BaseButton v-if="hasPermissionTo('addRole')" @click="showModal" title="Add Role" />
+      <BaseButton v-if="hasPermissionTo('add role')" @click="showModal" title="Add Role" />
     </div>
 
     <table>

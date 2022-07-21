@@ -5,13 +5,24 @@
       In the customer section, you will review and manage all solar product
       customers.
     </div>
+    <div class="d-flex justify-content-end">
+<!-- v-if="hasPermissionTo('add customer')" -->
+  <button
+      
+      @click="showSMSModal"
+      class="btn ms-auto me-3 border"
+    >
+      Send SMS Message
+    </button>
     <button
       v-if="hasPermissionTo('add customer')"
       @click="showAddModal"
-      class="btn ms-auto d-flex justify-self-end btn-bg-primary text-light"
+      class="btn  btn-bg-primary text-light"
     >
       Add New Customer
     </button>
+    </div>
+  
     <hr />
     <div class="d-flex p-2 justify-content-between selection-bar">
       <div class="position-relative w-50 me-2">
@@ -316,6 +327,23 @@
     </div>
   </base-modal>
 
+<!-- mass sms base modal -->
+  <base-modal
+    :modalState="isMessageModalShown"
+    btnLabel="Send"
+    :isLoading="isLoading"
+    title="SMS message"
+    @close="closeMessageModal"
+    @submit="sendMessage"
+  >
+    <!-- <p>
+      Do u want to delete? <br />
+      <strong>{{
+        customerForDelete?.first_name + " " + customerForDelete?.last_name
+      }}</strong>
+    </p> -->
+    here we go 
+  </base-modal>
   <!--  -->
   <the-alert
     :isVisible="isAlertVisible"
@@ -336,6 +364,7 @@ import {
   maxLength,
 } from "@vuelidate/validators";
 import exportFromJSON from "export-from-json";
+const newLocal=this;
 export default {
   components: {
     Paginate,
@@ -345,6 +374,7 @@ export default {
       v$: useValidate(),
       isAddModalVisible: false,
       isDeleteModalVisible: false,
+      isMessageModalShown:false,
       customerForDelete: {},
       searchQuery: "",
       isLoading: false,
@@ -382,6 +412,12 @@ export default {
     },
   },
   methods: {
+    closeMessageModal(){
+      this.isMessageModalShown=true;
+    },
+    sendMessage(){
+
+    },
     hasPermissionTo(act) {
       let index = this.user?.role?.permissions.findIndex(
         (per) => per.name.toLowerCase() === act.toLowerCase()
@@ -433,7 +469,7 @@ export default {
     },
     closeAddModal() {
       this.v$.$reset();
-      this.resetFieldEmpity();
+      newLocal.resetFieldEmpity();
       this.isAddModalVisible = false;
     },
     showAddModal() {
