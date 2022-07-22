@@ -188,10 +188,17 @@ export default {
         );
         if (response.status === 200) {
           this.$emit("newProductAdded", response.data.data);
-        } else throw "";
+        }
+        if(response.status == 201){
+        this.isAlertVisible = true;
+        this.alertMessage = "The requested product quantity is over the stock.";
+        this.isRequestSucceed = false;
+        }
+
+        else throw "";
       } catch (e) {
         this.isAlertVisible = true;
-        this.alertMessage = "Faild to add a new language";
+        this.alertMessage = "Faild to send product";
         this.isRequestSucceed = false;
       } finally {
         this.isLoading = false;

@@ -17,7 +17,7 @@
         <span class="align-self-center text-white px-1 rounded"
           ><i class="fas fa-user fs-4 fw-bold"></i
         ></span>
-        <div class="d-flex flex-column">
+        <div v-if="user" class="d-flex flex-column">
           <span class="fw-bold small text-center text-capitalize">{{user?.first_name+' '+user?.last_name}}</span>
           <span class="small text-capitalize">{{user?.manager_city}}</span>
         </div>

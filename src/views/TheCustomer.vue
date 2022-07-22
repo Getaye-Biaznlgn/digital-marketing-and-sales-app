@@ -420,7 +420,7 @@ export default {
       try {
         const response = await apiClient.post(
           "/api/broadcast_message",
-          this.smsMessage
+         {message:this.smsMessage} 
         );
         if (response.status === 201) {
           this.customers.push(response.data);
