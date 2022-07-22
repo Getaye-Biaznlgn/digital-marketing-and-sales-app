@@ -422,7 +422,7 @@ export default {
           "/api/broadcast_message",
          {message:this.smsMessage} 
         );
-        if (response.status === 201) {
+        if (response.status === 200) {
           this.customers.push(response.data);
           this.setAlertData(true, "You have broadcast message successfully");
         } else throw "";
