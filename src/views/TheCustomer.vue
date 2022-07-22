@@ -485,8 +485,9 @@ export default {
     },
     closeAddModal() {
       this.v$.$reset();
-      newLocal.resetFieldEmpity();
       this.isAddModalVisible = false;
+      newLocal.resetFieldEmpity();
+      
     },
     showAddModal() {
       this.forUpdate = false;

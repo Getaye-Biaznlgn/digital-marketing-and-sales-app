@@ -116,7 +116,7 @@ export default {
     async deletePendingProduct(product) {
       try {
         const response = await apiClient.delete(
-          `/api/product_distribution_data/${this.product.id}`
+          `/api/product_distribution_data/${product.id}`
         );
         if (response.status === 200) {
           const deletedIndex = this.pendingProducts.findIndex((prod) => {
