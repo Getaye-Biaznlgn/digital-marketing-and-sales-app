@@ -544,7 +544,7 @@ export default {
       if (!this.v$.$error) {
         this.isLoading = true;
         try {
-          const response = await apiClient.post("/api/system_user", {
+          const response = await apiClient.post("/api/system_users", {
             ...this.employee,
             phone_numbers: [this.employee.phone_number],
           });
