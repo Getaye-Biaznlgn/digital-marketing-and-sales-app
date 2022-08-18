@@ -186,10 +186,14 @@ export default {
             products: [...this.selectedProductQty],
           }
         );
-        if (response.status === 200) {
-          this.$emit("newProductAdded", response.data.data);
+        if (response.status == 200) {
+
+          this.$emit("newProductAdded", response.data);
+           this.isAlertVisible = true;
+        this.alertMessage = "The product is successfully sent to shop.";
+        this.isRequestSucceed = true;
         }
-        if(response.status == 201){
+       else if(response.status == 201){
         this.isAlertVisible = true;
         this.alertMessage = "The requested product quantity is over the stock.";
         this.isRequestSucceed = false;

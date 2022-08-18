@@ -1,6 +1,6 @@
 import axios from "axios";
 let apiClient = axios.create({
-  baseURL: "http://10.161.166.32:8000",
+  baseURL: "https://rensys-laravel.merahitechnologies.com",
   headers: {
     Accept: "application/json",
     "Content-Type": "application/json",

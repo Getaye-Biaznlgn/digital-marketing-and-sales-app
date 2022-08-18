@@ -9,7 +9,6 @@
       ></span>
       <span class="mt-1 fs-5 fw-bold">Shop Detail</span>
     </div>
-
     <div class="mx-3">
       <div class="d-flex justify-content-between">
         <div>
@@ -94,9 +93,12 @@ export default {
       this.selectedComponent = "ShopDistribution";
       // this.isSendProductModalVisible=true;
     },
+    // newProductAdded
     addPendingProduct(value) {
-      let previous = this.pendingProducts;
-      this.pendingProducts = [...value, ...previous];
+
+      // let previous = this.pendingProducts;
+      this.pendingProducts.push.apply(this.pendingProducts, value);
+      // this.pendingProducts = [...value, ...previous];
     },
     async fetchShopProduct() {
       try {

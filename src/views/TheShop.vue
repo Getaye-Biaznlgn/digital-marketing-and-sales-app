@@ -207,7 +207,7 @@ export default {
       filterString: "",
       alertMessage: "",
       searchValue: "",
-
+//
       isLoading: false,
       shops: [],
       //shop for edit

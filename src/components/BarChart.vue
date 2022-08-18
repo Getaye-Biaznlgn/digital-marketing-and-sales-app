@@ -78,7 +78,8 @@ export default {
     },
     data(values) {
       this.salesChartData.data.datasets[0].data = values;
-      this.drawGraph()
+     this.drawGraph()
+
     },
   },
 };
