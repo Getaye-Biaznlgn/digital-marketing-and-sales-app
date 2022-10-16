@@ -12,13 +12,13 @@ export default {
     labels: {
       required: false,
       default: [
-        "Monday",
-        "Tuesday",
-        "Sunday",
-        "Wednesday",
-        "Friday",
-        "Saturday",
-        "Thursdary",
+        // "Monday",
+        // "Tuesday1",
+        // "Sunday",
+        // "Wednesday",
+        // "Friday",
+        // "Saturday",
+        // "Thursdary",
       ],
     },
     data: {
@@ -57,16 +57,17 @@ export default {
           },
         },
       },
-      salesChart:null
+      salesChart: null,
     };
   },
   methods: {
     drawGraph() {
-      if(this.salesChart)
-         this.salesChart.destroy()
+
+      if (this.salesChart) this.salesChart.destroy();
       const ctx = document.getElementById("barChart").getContext("2d");
       Chart.defaults.color = "#f1f1f1";
-     this.salesChart= new Chart(ctx, this.salesChartData);
+      this.salesChart = new Chart(ctx, this.salesChartData);
+      console.log('table data', this.salesChartData)
     },
   },
   mounted() {
@@ -78,8 +79,8 @@ export default {
     },
     data(values) {
       this.salesChartData.data.datasets[0].data = values;
-     this.drawGraph()
-
+      this.drawGraph();
+      // console.log(values);
     },
   },
 };

@@ -55,7 +55,7 @@
             <div class="d-flex mb-2 mx-2 justify-content-between">
               <strong>Customer Analytics</strong>
               <div>
-                <select
+                <!-- <select
                   @change="fetchCustomerStatistics()"
                   v-model="selectedTimeForBar"
                   name="customeranalytics"
@@ -65,7 +65,7 @@
                   <option value="week">This Week</option>
                   <option value="month">This Month</option>
                   <option value="year">This Year</option>
-                </select>
+                </select> -->
               </div>
             </div>
             <bar-chart
@@ -80,7 +80,7 @@
             <div class="d-flex mb-2 mx-2 justify-content-between">
               <strong>Sold Product Report</strong>
               <div>
-                <select
+                <!-- <select
                   @change="fetchSoldProductStatistics()"
                   v-model="selectedTimeForPie"
                   name=""
@@ -90,7 +90,7 @@
                   <option value="week">This Week</option>
                   <option value="month">This Month</option>
                   <option value="year">This Year</option>
-                </select>
+                </select> -->
               </div>
             </div>
             <pie-chart
@@ -154,8 +154,8 @@ import { useStore } from "vuex";
 import { ref } from "vue";
 const orders = ref([]);
 const store = useStore();
-const selectedTimeForBar = ref("week");
-const selectedTimeForPie = ref("week");
+const selectedTimeForBar = ref("year");
+const selectedTimeForPie = ref("year");
 // for total_customer, total_order, total_product
 const marketStatistics = ref({});
 const barGraphValues = ref([]);
